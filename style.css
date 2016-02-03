@@ -1,0 +1,24 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: "Segoe UI", Verdana, "Verdana Ref", sans-serif;
+}
+
+.container, .row, .col-md-8, #map {
+  height: 100%;
+}
+
+.row {
+  padding-top: 75px;
+  padding-bottom: 25px;
+}
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
