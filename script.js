@@ -1,3 +1,38 @@
+/*
+* throttle Utility function (borrowed from underscore)
+*/
+function throttle (func, wait, options) {
+  var context, args, result;
+  var timeout = null;
+  var previous = 0;
+  if (!options) options = {};
+  var later = function () {
+    previous = options.leading === false ? 0 : new Date().getTime();
+    timeout = null;
+    result = func.apply(context, args);
+    if (!timeout) context = args = null;
+  };
+  return function () {
+    var now = new Date().getTime();
+    if (!previous && options.leading === false) previous = now;
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    } else if (!timeout && options.trailing !== false) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+};
+
 var map = L.map('map').setView([41.907477, -87.685913], 10);
 
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -50,4 +85,77 @@ $.ajax({
           responsive : true
         });
     }
+});
+
+var API_RATE_LIMIT = 500;
+var inputElement = document.getElementById("addr-search");
+
+var mapzen_key = "search-F2Xk0nk";
+var auto_url = 'https://search.mapzen.com/v1/autocomplete';
+var search_url = 'https://search.mapzen.com/v1/search';
+
+var addresses = [];
+
+var addr_matches = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.whitespace,
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  local: addresses
+});
+
+$('.typeahead').typeahead(null,
+{
+  name: 'addresses',
+  source: addr_matches
+  //display: function(addr) {return addr.properties.label }
+});
+
+function searchAddress(submitAddr) {
+  var params = {
+    api_key: mapzen_key,
+    "focus.point.lon": -87.63,
+    "focus.point.lat": 41.88,
+    text: inputElement.value
+  };
+  // if optional argument supplied, call search endpoint
+  if (submitAddr === true) {
+    callMapzen(search_url, params);
+  }
+  else if (inputElement.value.length > 0) {
+    callMapzen(auto_url, params);
+  }
+};
+
+function callMapzen(url, search_params) {
+  $.ajax({
+    url: url,
+    data: search_params,
+    dataType: "json",
+    success: function(data) {
+      if (url === auto_url && data.features.length > 0) {
+        addr_matches.clear();
+        addr_matches.add(data.features.map(function(addr) {return addr.properties.label}));
+      }
+      else if (url === search_url) {
+        if (data && data.features) {
+          map.setView([data.features[0].geometry.coordinates[1], data.features[0].geometry.coordinates[0]], 12);
+          var marker = L.marker([data.features[0].geometry.coordinates[1], data.features[0].geometry.coordinates[0]]).addTo(map);
+        }
+      }
+    },
+    error: function(err) {
+      console.log(err);
+    }
+  });
+}
+
+inputElement.addEventListener('keyup', throttle(searchAddress, API_RATE_LIMIT));
+
+$('.typeahead').bind('typeahead:select', function(ev, suggestion) {
+  searchAddress(true);
+});
+
+$(".typeahead").keyup(function (e) {
+  if (e.keyCode == 13) {
+    searchAddress(true);
+  }
 });

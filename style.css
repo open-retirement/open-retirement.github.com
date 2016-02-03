@@ -4,13 +4,39 @@ html, body {
   font-family: "Segoe UI", Verdana, "Verdana Ref", sans-serif;
 }
 
-.container, .row, .col-md-8, #map {
+.navbar-collapse.collapse {
+display: block!important;
+}
+
+.navbar-nav>li, .navbar-nav {
+float: left !important;
+}
+
+
+.navbar-nav.navbar-right:last-child {
+margin-right: -15px !important;
+}
+
+.navbar-right {
+float: right!important;
+}
+
+.container, .row, .col-sm-8, #map {
   height: 100%;
 }
 
 .row {
   padding-top: 75px;
   padding-bottom: 25px;
+}
+
+.col-sm-4 div, #addr-search {
+  margin: auto;
+  width: 350px;
+}
+
+.tt-suggestion {
+  background-color: white;
 }
 
 .axis {
