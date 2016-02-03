@@ -23,14 +23,14 @@
     </nav>
     <div class="container">
       <div class="row">
-        <div class="col-sm-4">
-          <div>
-            <input class="typeahead" id="addr-search" type="text">
-          </div>
-          <canvas id='canvas' height='200' width='300'></canvas>
-        </div>
-        <div class="col-sm-8">
+        <div class="col-sm-8 col-sm-push-4">
           <div id="map"></div>
+        </div>
+        <div class="col-sm-4 col-sm-pull-8">
+          <img id="logo" class="img-responsive" src="logo.png">
+          <input class="typeahead" id="addr-search" type="text">
+          <div id="canvas-label">Please select a facility</div>
+          <canvas id='canvas'></canvas>
         </div>
       </div>
     </div>

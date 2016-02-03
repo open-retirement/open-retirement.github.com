@@ -30,9 +30,25 @@ float: right!important;
   padding-bottom: 25px;
 }
 
-.col-sm-4 div, #addr-search {
-  margin: auto;
-  width: 350px;
+.img-responsive {
+  width: 75%;
+  margin: 0 auto;
+  margin-bottom: 25px;
+}
+
+div#canvas-label {
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+
+#addr-search {
+  width: 100%;
+}
+
+span.twitter-typeahead {
+  width: 100%;
+  margin-bottom: 50px;
 }
 
 .tt-suggestion {
