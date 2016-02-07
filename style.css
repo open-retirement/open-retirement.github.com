@@ -51,8 +51,20 @@ span.twitter-typeahead {
   margin-bottom: 50px;
 }
 
+.tt-menu {
+  width: 100%;
+  background-color: white;
+  border: 1px solid #9a9b9f;
+}
+
 .tt-suggestion {
   background-color: white;
+  width: 100%;
+  padding: 5px;
+}
+
+.tt-cursor {
+  background-color: #cfd0d3;
 }
 
 .axis {
