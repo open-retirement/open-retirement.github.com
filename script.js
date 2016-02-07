@@ -82,7 +82,7 @@ function medicare_locations(latlon) {
 var API_RATE_LIMIT = 500;
 var inputElement = document.getElementById("addr-search");
 
-var mapzen_key = "search-F2Xk0nk";
+var mapzen_key = "search-Cq8H0_o";
 var auto_url = 'https://search.mapzen.com/v1/autocomplete';
 var search_url = 'https://search.mapzen.com/v1/search';
 
