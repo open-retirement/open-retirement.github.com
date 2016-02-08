@@ -4,6 +4,13 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+var chi_boxes = chi_geo.features.map(function(geo) {
+  var geo_box = {};
+  geo_box.name = geo.properties.name;
+  geo_box.coordinates = geo.geometry.coordinates[0];
+  return geo_box;
+});
+
 var markerArray = [];
 
 var barChartData = {
