@@ -41,7 +41,7 @@ function onEachFeature(feature, layer) {
                   "<b>Q3 Score:</b> " + feature.properties.scores[2]);
   layer.on('click', function(e) {
     var facility_data = barChartData;
-    test_data = feature.properties.scores.map(function(score) {return parseFloat(score)});
+    test_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
     facility_data.datasets[0].data = test_data;
     ctx_bar.destroy();
     ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
@@ -86,7 +86,7 @@ function medicare_locations(latlon) {
   });
 }
 
-var API_RATE_LIMIT = 500;
+var API_RATE_LIMIT = 1000;
 var inputElement = document.getElementById("addr-search");
 
 var mapzen_key = "search-Cq8H0_o";
@@ -121,7 +121,7 @@ function searchAddress(submitAddr) {
   else if (inputElement.value.length > 0) {
     callMapzen(auto_url, params);
   }
-};
+}
 
 function callMapzen(url, search_params) {
   $.ajax({
@@ -131,7 +131,7 @@ function callMapzen(url, search_params) {
     success: function(data) {
       if (url === auto_url && data.features.length > 0) {
         addr_matches.clear();
-        addr_matches.add(data.features.map(function(addr) {return addr.properties.label}));
+        addr_matches.add(data.features.map(function(addr) {return addr.properties.label;}));
       }
       else if (url === search_url) {
         if (data && data.features) {
@@ -191,4 +191,4 @@ function throttle (func, wait, options) {
     }
     return result;
   };
-};
+}
