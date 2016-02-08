@@ -4,87 +4,142 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+// Set up bounding boxes for neighborhoods
+
 var chi_boxes = chi_geo.features.map(function(geo) {
   var geo_box = {};
+  geo_box.gid = geo.properties.gid;
   geo_box.name = geo.properties.name;
-  geo_box.coordinates = geo.geometry.coordinates[0];
+  geo_box.coordinates = [geo.geometry.coordinates[0][1].reverse(), geo.geometry.coordinates[0][3].reverse()];
+  geo_box.center = [(geo_box.coordinates[0][0] + geo_box.coordinates[1][0]) / 2, (geo_box.coordinates[0][1] + geo_box.coordinates[1][1]) / 2];
+  var box_li = document.createElement("OPTION");
+  var box_text = document.createTextNode(geo_box.name);
+  box_li.value = geo_box.gid;
+  box_li.appendChild(box_text);
+  document.getElementsByTagName("select")[0].appendChild(box_li);
   return geo_box;
 });
+
+// Create empty, default bar chart
 
 var markerArray = [];
 
 var barChartData = {
-  labels : ["Q1 Score", "Q2 Score", "Q3 Score"],
+  labels : ["Overall", "Health", "QM", "Staff", "RN"],
   datasets : [
     {
       fillColor : "#000080",
       highlightFill: "#000080",
-      data : [0,0,0]
+      data : [0,0,0,0,0]
     },
   ]
 };
+
 var ctx = document.getElementById("canvas").getContext("2d");
 var barChartOptions = {
   responsive : true,
   scaleOverride : true,
-  scaleSteps : 4,
-  scaleStepWidth : 25,
-  scaleStartValue : 0
+  scaleIntegersOnly: true,
+  scaleSteps: 5,
+  scaleStepWidth: 1,
+  scaleStartValue: 0
 };
 
 var ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
 
+// Create popup for each nursing home facility pulling its properties
+
 function onEachFeature(feature, layer) {
   layer.bindPopup("<b>Facility:</b> " + feature.properties.name + "<br>" +
-                  "<b>Q1 Score:</b> " + feature.properties.scores[0] + "<br>" +
-                  "<b>Q2 Score:</b> " + feature.properties.scores[1] + "<br>" +
-                  "<b>Q3 Score:</b> " + feature.properties.scores[2]);
+                  "<b>Overall:</b> " + feature.properties.scores[0] + "<br>" +
+                  "<b>Health Inspection:</b> " + feature.properties.scores[1] + "<br>" +
+                  "<b>QM:</b> " + feature.properties.scores[2] + "<br>" +
+                  "<b>Staffing:</b> " + feature.properties.scores[3] + "<br>" +
+                  "<b>RN Staffing:</b> " + feature.properties.scores[4]);
   layer.on('click', function(e) {
     var facility_data = barChartData;
-    test_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
-    facility_data.datasets[0].data = test_data;
+    ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
+    facility_data.datasets[0].data = ret_data;
     ctx_bar.destroy();
     ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
     $("#canvas-label").text(feature.properties.name);
   });
 }
 
-function medicare_locations(latlon) {
-  // Currently querying for specific code, will need to broaden this out?
-  var query_string = "https://data.medicare.gov/resource/djen-97ju.json?measure_code=419&$where=within_circle(location," +
+// Callback for loading nursing homes from Medicare Socrata API
+
+function handleMedicareResponse(responses) {
+  var fac_geo_agg = responses.map(function(facility) {
+    var fac_geo = {
+      type: "Feature",
+      properties: {},
+      geometry: {
+          type: "Point",
+          coordinates: []
+      }
+    };
+    fac_geo.properties.street_addr = facility.provider_address;
+    fac_geo.properties.city = facility.provider_city;
+    fac_geo.properties.state = facility.provider_state;
+    fac_geo.properties.scores = [facility.overall_rating,
+                                 facility.health_inspection_rating,
+                                 facility.qm_rating,
+                                 facility.staffing_rating,
+                                 facility.rn_staffing_rating];
+    // Figure out how to handle undefined here
+    fac_geo.properties.name = facility.provider_name;
+    fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
+                                    parseFloat(facility.location.latitude)];
+    var add_fac_geo = L.geoJson(fac_geo, {
+      onEachFeature: onEachFeature
+    });
+    add_fac_geo.addTo(map);
+    markerArray.push(add_fac_geo);
+  });
+}
+
+// Functions for querying by address point and neighborhood
+
+function queryPointMedicare(latlon) {
+  // Currently querying for all codes
+  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?measure_code=419&$where=within_circle(location," +
                      latlon[1] + "," + latlon[0] + ",1500)";
   console.log(query_string);
   $.ajax({
       url: query_string,
       dataType: "json",
-      success: function (data) {
-        var fac_geo_agg = data.map(function(facility) {
-          var fac_geo = {
-            type: "Feature",
-            properties: {},
-            geometry: {
-                type: "Point",
-                coordinates: []
-            }
-          };
-          fac_geo.properties.street_addr = facility.provider_address;
-          fac_geo.properties.city = facility.provider_city;
-          fac_geo.properties.state = facility.provider_state;
-          fac_geo.properties.scores = [facility.q1_measure_score,
-                                       facility.q2_measure_score,
-                                       facility.q3_measure_score];
-          fac_geo.properties.name = facility.provider_name;
-          fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
-                                          parseFloat(facility.location.latitude)];
-          var add_fac_geo = L.geoJson(fac_geo, {
-            onEachFeature: onEachFeature
-          });
-          add_fac_geo.addTo(map);
-          markerArray.push(add_fac_geo);
-        });
-      }
+      success: handleMedicareResponse
   });
 }
+
+/* Medicare search by neighborhood */
+
+function queryBoxMedicare(bbox) {
+  // Currently querying for all codes
+  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=within_box(location," +
+                   bbox.toString() + ")";
+  console.log(query_string);
+  $.ajax({
+      url: query_string,
+      dataType: "json",
+      success: handleMedicareResponse
+  });
+}
+
+var selectEl = document.getElementsByTagName("select")[0];
+selectEl.addEventListener("change", function() {
+  if (this.value !== "") {
+    for (var i = 0; i < chi_boxes.length; ++i) {
+      if (chi_boxes[i].gid == this.value) {
+        map.setView(chi_boxes[i].center, 13);
+        queryBoxMedicare(chi_boxes[i].coordinates);
+        break;
+      }
+    }
+  }
+});
+
+// Mapzen search functionality and details
 
 var API_RATE_LIMIT = 1000;
 var inputElement = document.getElementById("addr-search");
@@ -136,7 +191,7 @@ function callMapzen(url, search_params) {
       else if (url === search_url) {
         if (data && data.features) {
           map.setView([data.features[0].geometry.coordinates[1], data.features[0].geometry.coordinates[0]], 14);
-          medicare_locations(data.features[0].geometry.coordinates);
+          queryPointMedicare(data.features[0].geometry.coordinates);
         }
       }
     },

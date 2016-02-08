@@ -36,19 +36,23 @@ float: right!important;
   margin-bottom: 25px;
 }
 
+select {
+  margin-bottom: 25px;
+}
+
 div#canvas-label {
   width: 100%;
   text-align: center;
   font-weight: bold;
+  margin-top: 25px;
 }
 
 #addr-search {
   width: 100%;
 }
 
-span.twitter-typeahead {
+span.twitter-typeahead, input.typeahead {
   width: 100%;
-  margin-bottom: 50px;
 }
 
 .tt-menu {
@@ -64,7 +68,7 @@ span.twitter-typeahead {
 }
 
 .tt-cursor {
-  background-color: #cfd0d3;
+  background-color: #dcedf4;
 }
 
 .axis {
