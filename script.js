@@ -102,7 +102,7 @@ function handleMedicareResponse(responses) {
 
 function queryPointMedicare(latlon) {
   // Currently querying for all codes
-  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?measure_code=419&$where=within_circle(location," +
+  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=within_circle(location," +
                      latlon[1] + "," + latlon[0] + ",1500)";
   console.log(query_string);
   $.ajax({
