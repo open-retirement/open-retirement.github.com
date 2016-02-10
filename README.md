@@ -2,4 +2,6 @@
 
 Start of basic demo pulling data directly from [Medicare Open Data](https://data.medicare.gov/)
 
-Specific dataset used is for [Quality Measures](https://data.medicare.gov/Nursing-Home-Compare/Quality-Measures/djen-97ju)
+Specific dataset used is for [Provider Info](https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py)
+
+[Live demo here](http://open-retirement.github.io/nursing_home_leaflet/)
