@@ -6,14 +6,14 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 
 // Set up bounding boxes for neighborhoods
 
-var chi_boxes = chi_geo.features.map(function(geo) {
+var chi_boxes = chi_zip.features.map(function(geo) {
   var geo_box = {};
   geo_box.gid = geo.properties.gid;
-  geo_box.name = geo.properties.name;
+  geo_box.zip = geo.properties.zip;
   geo_box.coordinates = [geo.geometry.coordinates[0][1].reverse(), geo.geometry.coordinates[0][3].reverse()];
   geo_box.center = [(geo_box.coordinates[0][0] + geo_box.coordinates[1][0]) / 2, (geo_box.coordinates[0][1] + geo_box.coordinates[1][1]) / 2];
   var box_li = document.createElement("OPTION");
-  var box_text = document.createTextNode(geo_box.name);
+  var box_text = document.createTextNode(geo_box.zip);
   box_li.value = geo_box.gid;
   box_li.appendChild(box_text);
   document.getElementsByTagName("select")[0].appendChild(box_li);
