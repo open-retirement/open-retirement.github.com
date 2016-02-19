@@ -226,6 +226,18 @@ $('#zip-search').bind('typeahead:select', function(ev, data) {
   queryBoxMedicare(data.coordinates);
 });
 
+$("#zip-search").keyup(function (e) {
+  if (e.keyCode == 13) {
+    var zip_val = document.getElementById("zip-search").value;
+    for (var i = 0; i < chi_boxes.length; ++i) {
+      if (chi_boxes[i].zip === zip_val) {
+        map.setView(chi_boxes[i].center, 14);
+        queryBoxMedicare(chi_boxes[i].coordinates);
+      }
+    }
+  }
+});
+
 /*
 * throttle Utility function (borrowed from underscore)
 */
