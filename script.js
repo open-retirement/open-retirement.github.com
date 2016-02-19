@@ -35,6 +35,7 @@ var ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
 
 function onEachFeature(feature, layer) {
   layer.bindPopup("<b>Facility:</b> " + feature.properties.name + "<br>" +
+                  "<b>Ownership:</b> " + feature.properties.ownership_type + "<br>" +
                   "<b>Overall:</b> " + feature.properties.scores[0] + "<br>" +
                   "<b>Health Inspection:</b> " + feature.properties.scores[1] + "<br>" +
                   "<b>QM:</b> " + feature.properties.scores[2] + "<br>" +
@@ -65,6 +66,7 @@ function handleMedicareResponse(responses) {
     fac_geo.properties.street_addr = facility.provider_address;
     fac_geo.properties.city = facility.provider_city;
     fac_geo.properties.state = facility.provider_state;
+    fac_geo.properties.ownership_type = facility.ownership_type;
     fac_geo.properties.scores = [facility.overall_rating,
                                  facility.health_inspection_rating,
                                  facility.qm_rating,
