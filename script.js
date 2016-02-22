@@ -4,6 +4,18 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+// Load map with default layer of all Cook County nursing homes
+
+$(document).ready(function() {
+  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=" +
+    "provider_state='IL'&provider_county_name='Cook'";
+  $.ajax({
+      url: query_string,
+      dataType: "json",
+      success: handleMedicareResponse
+  });
+});
+
 // Create empty, default bar chart
 
 var markerArray = [];
@@ -54,6 +66,10 @@ function onEachFeature(feature, layer) {
 // Callback for loading nursing homes from Medicare Socrata API
 
 function handleMedicareResponse(responses) {
+  // Remove all existing markers from the map
+  markerArray.map(function(marker) {
+    map.removeLayer(marker);
+  });
   var fac_geo_agg = responses.map(function(facility) {
     var fac_geo = {
       type: "Feature",
@@ -74,13 +90,15 @@ function handleMedicareResponse(responses) {
                                  facility.rn_staffing_rating];
     // Figure out how to handle undefined here
     fac_geo.properties.name = facility.provider_name;
-    fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
-                                    parseFloat(facility.location.latitude)];
-    var add_fac_geo = L.geoJson(fac_geo, {
-      onEachFeature: onEachFeature
-    });
-    add_fac_geo.addTo(map);
-    markerArray.push(add_fac_geo);
+    if (!isNaN(parseFloat(facility.location.longitude))) {
+      fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
+                                      parseFloat(facility.location.latitude)];
+      var add_fac_geo = L.geoJson(fac_geo, {
+        onEachFeature: onEachFeature
+      });
+      add_fac_geo.addTo(map);
+      markerArray.push(add_fac_geo);
+    }
   });
 }
 
