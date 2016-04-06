@@ -1,8 +1,72 @@
 var map = L.map('map').setView([41.907477, -87.685913], 10);
 
-L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+// Changed to lighter theme to show markers better
+// Clean up attribution, but wanted to have it in for now
+L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a><br>      <div>Icons made by <a href="http://www.flaticon.com/authors/simpleicon" title="SimpleIcon">SimpleIcon</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>'
 }).addTo(map);
+
+// TO-DO's with scale
+// - Should add a legend for scale on the side to explain ratings
+// - Should remove QM rating because self reported
+var ScaleIconOne = L.Icon.Default.extend({
+  options: {
+    iconUrl: 'images/scale1.svg',
+    shadowSize: '0'
+  }
+});
+var ScaleIconTwo = L.Icon.Default.extend({
+  options: {
+    iconUrl: 'images/scale2.svg',
+    shadowSize: '0'
+  }
+});
+var ScaleIconThree = L.Icon.Default.extend({
+  options: {
+    iconUrl: 'images/scale3.svg',
+    shadowSize: '0'
+  }
+});
+var ScaleIconFour = L.Icon.Default.extend({
+  options: {
+    iconUrl: 'images/scale4.svg',
+    shadowSize: '0'
+  }
+});
+var ScaleIconFive = L.Icon.Default.extend({
+  options: {
+    iconUrl: 'images/scale5.svg',
+    shadowSize: '0'
+  }
+});
+
+var scaleOne = new ScaleIconOne();
+var scaleTwo = new ScaleIconTwo();
+var scaleThree = new ScaleIconThree();
+var scaleFour = new ScaleIconFour();
+var scaleFive = new ScaleIconFive();
+
+// Iterating through different scale icons and assigning based on score
+function getMarkerIcon(feature) {
+  if (feature.properties.scores[0] == 1) {
+    return scaleOne;
+  }
+  else if (feature.properties.scores[0] == 2) {
+    return scaleTwo;
+  }
+  else if (feature.properties.scores[0] == 3) {
+    return scaleThree;
+  }
+  else if (feature.properties.scores[0] == 4) {
+    return scaleFour;
+  }
+  else if (feature.properties.scores[0] == 5) {
+    return scaleFive;
+  }
+  else {
+    return scaleOne; // Fix this, currently just defaulting to one
+  }
+}
 
 // Load map with default layer of all Cook County nursing homes
 
@@ -94,6 +158,9 @@ function handleMedicareResponse(responses) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
                                       parseFloat(facility.location.latitude)];
       var add_fac_geo = L.geoJson(fac_geo, {
+        pointToLayer: function(feature, latlng) {
+          return L.marker(latlng, {icon: getMarkerIcon(feature)});
+        },
         onEachFeature: onEachFeature
       });
       add_fac_geo.addTo(map);
