@@ -1,75 +1,12 @@
-var map = L.map('map').setView([41.907477, -87.685913], 10);
+L.mapbox.accessToken = 'pk.eyJ1IjoiY25ocyIsImEiOiJjaW11eXJiamwwMmprdjdra29kcW1xb2J2In0.ERYma-Q2MQtY6D02V-Fobg';
 
-// Changed to lighter theme to show markers better
-// Clean up attribution, but wanted to have it in for now
-L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a><br>      <div>Icons made by <a href="http://www.flaticon.com/authors/simpleicon" title="SimpleIcon">SimpleIcon</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>'
-}).addTo(map);
+var map = L.mapbox.map('map', 'mapbox.light')
+    .setView([41.907477, -87.685913], 10);
+var medicareLayer = L.mapbox.featureLayer().addTo(map);
 
-// TO-DO's with scale
-// - Should add a legend for scale on the side to explain ratings
-// - Should remove QM rating because self reported
-var ScaleIconOne = L.Icon.Default.extend({
-  options: {
-    iconUrl: 'images/scale1.svg',
-    shadowSize: '0'
-  }
-});
-var ScaleIconTwo = L.Icon.Default.extend({
-  options: {
-    iconUrl: 'images/scale2.svg',
-    shadowSize: '0'
-  }
-});
-var ScaleIconThree = L.Icon.Default.extend({
-  options: {
-    iconUrl: 'images/scale3.svg',
-    shadowSize: '0'
-  }
-});
-var ScaleIconFour = L.Icon.Default.extend({
-  options: {
-    iconUrl: 'images/scale4.svg',
-    shadowSize: '0'
-  }
-});
-var ScaleIconFive = L.Icon.Default.extend({
-  options: {
-    iconUrl: 'images/scale5.svg',
-    shadowSize: '0'
-  }
-});
-
-var scaleOne = new ScaleIconOne();
-var scaleTwo = new ScaleIconTwo();
-var scaleThree = new ScaleIconThree();
-var scaleFour = new ScaleIconFour();
-var scaleFive = new ScaleIconFive();
-
-// Iterating through different scale icons and assigning based on score
-function getMarkerIcon(feature) {
-  if (feature.properties.scores[0] == 1) {
-    return scaleOne;
-  }
-  else if (feature.properties.scores[0] == 2) {
-    return scaleTwo;
-  }
-  else if (feature.properties.scores[0] == 3) {
-    return scaleThree;
-  }
-  else if (feature.properties.scores[0] == 4) {
-    return scaleFour;
-  }
-  else if (feature.properties.scores[0] == 5) {
-    return scaleFive;
-  }
-  else {
-    return scaleOne; // Fix this, currently just defaulting to one
-  }
-}
+var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"]
 
 // Load map with default layer of all Cook County nursing homes
-
 $(document).ready(function() {
   var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=" +
     "provider_state='IL'&provider_county_name='Cook'";
@@ -81,16 +18,13 @@ $(document).ready(function() {
 });
 
 // Create empty, default bar chart
-
-var markerArray = [];
-
 var barChartData = {
-  labels : ["Overall", "Health", "QM", "Staff", "RN"],
+  labels : ["Overall", "Health", "Staff", "RN"],
   datasets : [
     {
       fillColor : "#000080",
       highlightFill: "#000080",
-      data : [0,0,0,0,0]
+      data : [0,0,0,0]
     },
   ]
 };
@@ -107,33 +41,29 @@ var barChartOptions = {
 
 var ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
 
-// Create popup for each nursing home facility pulling its properties
+medicareLayer.on('click', function(e) {
+  var facility_data = barChartData;
+  var feature = e.layer.feature;
+  ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
+  facility_data.datasets[0].data = ret_data;
+  ctx_bar.destroy();
+  ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
+  $("#canvas-label").text(feature.properties.title);
+});
 
-function onEachFeature(feature, layer) {
-  layer.bindPopup("<b>Facility:</b> " + feature.properties.name + "<br>" +
-                  "<b>Ownership:</b> " + feature.properties.ownership_type + "<br>" +
-                  "<b>Overall:</b> " + feature.properties.scores[0] + "<br>" +
-                  "<b>Health Inspection:</b> " + feature.properties.scores[1] + "<br>" +
-                  "<b>QM:</b> " + feature.properties.scores[2] + "<br>" +
-                  "<b>Staffing:</b> " + feature.properties.scores[3] + "<br>" +
-                  "<b>RN Staffing:</b> " + feature.properties.scores[4]);
-  layer.on('click', function(e) {
-    var facility_data = barChartData;
-    ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
-    facility_data.datasets[0].data = ret_data;
-    ctx_bar.destroy();
-    ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
-    $("#canvas-label").text(feature.properties.name);
-  });
+// Clear the chart data when map is moved
+map.on('move', empty);
+
+function empty() {
+  ctx_bar.destroy();
+  barChartData.datasets[0].data = [0,0,0,0];
+  ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
+  $("#canvas-label").text("Please select a facility");
 }
 
 // Callback for loading nursing homes from Medicare Socrata API
-
 function handleMedicareResponse(responses) {
-  // Remove all existing markers from the map
-  markerArray.map(function(marker) {
-    map.removeLayer(marker);
-  });
+  var markerArray = [];
   var fac_geo_agg = responses.map(function(facility) {
     var fac_geo = {
       type: "Feature",
@@ -143,30 +73,31 @@ function handleMedicareResponse(responses) {
           coordinates: []
       }
     };
+    // Leaving these in properties as they might be used later for filtering
     fac_geo.properties.street_addr = facility.provider_address;
     fac_geo.properties.city = facility.provider_city;
     fac_geo.properties.state = facility.provider_state;
     fac_geo.properties.ownership_type = facility.ownership_type;
     fac_geo.properties.scores = [facility.overall_rating,
                                  facility.health_inspection_rating,
-                                 facility.qm_rating,
                                  facility.staffing_rating,
                                  facility.rn_staffing_rating];
-    // Figure out how to handle undefined here
-    fac_geo.properties.name = facility.provider_name;
+
+    fac_geo.properties.title = facility.provider_name;
+    // Set marker color based off of score
+    fac_geo.properties['marker-color'] = markerColorArr[facility.overall_rating - 1];
+    fac_geo.properties.description = "<b>Ownership:</b> " + facility.ownership_type + "<br>" +
+                                     "<b>Overall:</b> " + facility.overall_rating + "<br>" +
+                                     "<b>Health Inspection:</b> " + facility.health_inspection_rating + "<br>" +
+                                     "<b>Staffing:</b> " + facility.staffing_rating + "<br>" +
+                                     "<b>RN Staffing:</b> " + facility.rn_staffing_rating;
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
                                       parseFloat(facility.location.latitude)];
-      var add_fac_geo = L.geoJson(fac_geo, {
-        pointToLayer: function(feature, latlng) {
-          return L.marker(latlng, {icon: getMarkerIcon(feature)});
-        },
-        onEachFeature: onEachFeature
-      });
-      add_fac_geo.addTo(map);
-      markerArray.push(add_fac_geo);
+      markerArray.push(fac_geo);
     }
   });
+  medicareLayer.setGeoJSON(markerArray);
 }
 
 // Functions for querying by address point and neighborhood
