@@ -18,14 +18,13 @@ $(document).ready(function() {
 });
 
 // Create empty, default bar chart
-
 var barChartData = {
-  labels : ["Overall", "Health", "QM", "Staff", "RN"],
+  labels : ["Overall", "Health", "Staff", "RN"],
   datasets : [
     {
       fillColor : "#000080",
       highlightFill: "#000080",
-      data : [0,0,0,0,0]
+      data : [0,0,0,0]
     },
   ]
 };
@@ -57,7 +56,7 @@ map.on('move', empty);
 
 function empty() {
   ctx_bar.destroy();
-  barChartData.datasets[0].data = [0,0,0,0,0];
+  barChartData.datasets[0].data = [0,0,0,0];
   ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
   $("#canvas-label").text("Please select a facility");
 }
@@ -81,18 +80,15 @@ function handleMedicareResponse(responses) {
     fac_geo.properties.ownership_type = facility.ownership_type;
     fac_geo.properties.scores = [facility.overall_rating,
                                  facility.health_inspection_rating,
-                                 facility.qm_rating,
                                  facility.staffing_rating,
                                  facility.rn_staffing_rating];
-    
-    // Figure out how to handle undefined here
+
     fac_geo.properties.title = facility.provider_name;
     // Set marker color based off of score
     fac_geo.properties['marker-color'] = markerColorArr[facility.overall_rating - 1];
     fac_geo.properties.description = "<b>Ownership:</b> " + facility.ownership_type + "<br>" +
                                      "<b>Overall:</b> " + facility.overall_rating + "<br>" +
                                      "<b>Health Inspection:</b> " + facility.health_inspection_rating + "<br>" +
-                                     "<b>QM:</b> " + facility.qm_rating + "<br>" +
                                      "<b>Staffing:</b> " + facility.staffing_rating + "<br>" +
                                      "<b>RN Staffing:</b> " + facility.rn_staffing_rating;
     if (!isNaN(parseFloat(facility.location.longitude))) {
