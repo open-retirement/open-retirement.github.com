@@ -42,27 +42,6 @@ var barChartOptions = {
 
 var ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
 
-/*
-// Create popup for each nursing home facility pulling its properties
-function onEachFeature(feature, layer) {
-  layer.bindPopup("<b>Facility:</b> " + feature.properties.name + "<br>" +
-                  "<b>Ownership:</b> " + feature.properties.ownership_type + "<br>" +
-                  "<b>Overall:</b> " + feature.properties.scores[0] + "<br>" +
-                  "<b>Health Inspection:</b> " + feature.properties.scores[1] + "<br>" +
-                  "<b>QM:</b> " + feature.properties.scores[2] + "<br>" +
-                  "<b>Staffing:</b> " + feature.properties.scores[3] + "<br>" +
-                  "<b>RN Staffing:</b> " + feature.properties.scores[4]);
-  layer.on('click', function(e) {
-    var facility_data = barChartData;
-    ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
-    facility_data.datasets[0].data = ret_data;
-    ctx_bar.destroy();
-    ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
-    $("#canvas-label").text(feature.properties.name);
-  });
-}
-*/
-
 medicareLayer.on('click', function(e) {
   var facility_data = barChartData;
   var feature = e.layer.feature;
@@ -73,12 +52,18 @@ medicareLayer.on('click', function(e) {
   $("#canvas-label").text(feature.properties.title);
 });
 
+// Clear the chart data when map is moved
+map.on('move', empty);
+
+function empty() {
+  ctx_bar.destroy();
+  barChartData.datasets[0].data = [0,0,0,0,0];
+  ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
+  $("#canvas-label").text("Please select a facility");
+}
+
 // Callback for loading nursing homes from Medicare Socrata API
 function handleMedicareResponse(responses) {
-  // Remove all existing markers from the map
-  //markerArray.map(function(marker) {
-    //map.removeLayer(marker);
-  //});
   var markerArray = [];
   var fac_geo_agg = responses.map(function(facility) {
     var fac_geo = {
@@ -89,6 +74,7 @@ function handleMedicareResponse(responses) {
           coordinates: []
       }
     };
+    // Leaving these in properties as they might be used later for filtering
     fac_geo.properties.street_addr = facility.provider_address;
     fac_geo.properties.city = facility.provider_city;
     fac_geo.properties.state = facility.provider_state;
@@ -98,6 +84,7 @@ function handleMedicareResponse(responses) {
                                  facility.qm_rating,
                                  facility.staffing_rating,
                                  facility.rn_staffing_rating];
+    
     // Figure out how to handle undefined here
     fac_geo.properties.title = facility.provider_name;
     // Set marker color based off of score
