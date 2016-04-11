@@ -1,10 +1,14 @@
 L.mapbox.accessToken = 'pk.eyJ1IjoiY25ocyIsImEiOiJjaW11eXJiamwwMmprdjdra29kcW1xb2J2In0.ERYma-Q2MQtY6D02V-Fobg';
 
-var map = L.mapbox.map('map', 'mapbox.light')
-    .setView([41.907477, -87.685913], 10);
+var map = L.mapbox.map('map', 'mapbox.light', {
+    legendControl: {
+      position: "bottomleft"
+    }
+}).setView([41.907477, -87.685913], 10);
 var medicareLayer = L.mapbox.featureLayer().addTo(map);
+map.legendControl.addLegend(document.getElementById('legend').innerHTML);
 
-var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"]
+var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"];
 
 // Load map with default layer of all Cook County nursing homes
 $(document).ready(function() {
