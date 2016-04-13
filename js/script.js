@@ -51,7 +51,7 @@ medicareLayer.on('click', function(e) {
   $("#canvas-label").text(feature.properties.title);
 });
 
-// Clear the chart data when map is moved
+/* Clear the chart data when map is moved
 map.on('move', empty);
 
 function empty() {
@@ -60,7 +60,7 @@ function empty() {
   ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
   $("#canvas-label").text("Please select a facility");
 }
-
+*/
 // Callback for loading nursing homes from Medicare Socrata API
 function handleMedicareResponse(responses) {
   var markerArray = [];
