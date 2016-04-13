@@ -4,6 +4,10 @@ html, body {
   font-family: "Lato", Verdana, "Verdana Ref", sans-serif;
 }
 
+h2 {
+  text-align: center;
+}
+
 .navbar-collapse.collapse {
 display: block!important;
 }
@@ -21,13 +25,18 @@ margin-right: -15px !important;
 float: right!important;
 }
 
-.container, .row, .col-sm-8, #map {
+#main, #main .row, .row .col-sm-8, #map {
   height: 100%;
 }
 
 .row {
   padding-top: 75px;
   padding-bottom: 25px;
+}
+
+/* Make sure that articles past the first don't have large padding at top */
+.article ~ .article {
+  padding-top: 0px;
 }
 
 .img-responsive {
