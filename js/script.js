@@ -87,10 +87,15 @@ function handleMedicareResponse(responses) {
                                  facility.staffing_rating,
                                  facility.rn_staffing_rating];
 
+    // Getting phone number and formatting it for tooltip
+    var provider_phone = facility.provider_phone_number.phone_number;
+    var phone = provider_phone.substr(0,3) + "-" + provider_phone.substr(3,3) + "-" + provider_phone.substr(6,4);
+
     fac_geo.properties.title = facility.provider_name;
     // Set marker color based off of score
     fac_geo.properties['marker-color'] = markerColorArr[facility.overall_rating - 1];
     fac_geo.properties.description = "<b>Ownership:</b> " + facility.ownership_type + "<br>" +
+                                     "<b>Phone Number:</b> " + phone + "<br>" +
                                      "<b>Overall:</b> " + facility.overall_rating + "<br>" +
                                      "<b>Health Inspection:</b> " + facility.health_inspection_rating + "<br>" +
                                      "<b>Staffing:</b> " + facility.staffing_rating + "<br>" +
