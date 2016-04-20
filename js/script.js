@@ -23,7 +23,7 @@ $(document).ready(function() {
 
 // Create empty, default bar chart
 var barChartData = {
-  labels : ["Overall", "Health", "Staff", "RN"],
+  labels : ["Overall Rating", "Health Inspections", "Overall Staffing", "Registered Nurses"],
   datasets : [
     {
       fillColor : "#000080",
