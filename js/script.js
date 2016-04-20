@@ -65,6 +65,7 @@ function empty() {
   $("#canvas-label").text("Please select a facility");
 }
 */
+
 // Callback for loading nursing homes from Medicare Socrata API
 function handleMedicareResponse(responses) {
   var markerArray = [];
