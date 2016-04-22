@@ -15,9 +15,11 @@ medicareLayer.on('layeradd', function(e) {
     var feature = marker.feature;
 
     // Create custom popup content
+    /*
     var popupContent =  "<div class='marker-title'>" + feature.properties.title + "</div>" +
-                        "<canvas id='canvas'></canvas>" +
-                        feature.properties.description;
+                        "<div id='chart_div'></div>" +
+                        feature.properties.description;*/
+    var popupContent =  "<div id='chart_div'></div>" + feature.properties.description;
 
     // http://leafletjs.com/reference.html#popup
     marker.bindPopup(popupContent,{
@@ -39,6 +41,38 @@ $(document).ready(function() {
   });
 });
 
+// Load the Visualization API and the corechart package.
+google.charts.load('current', {'packages':['corechart']});
+
+// Set a callback to run when the Google Visualization API is loaded.
+google.charts.setOnLoadCallback(function() {
+  console.log("Google Charts loaded!");
+});
+
+// Callback that creates and populates a data table,
+// instantiates the pie chart, passes in the data and
+// draws it.
+function drawChart(scores, title) {
+  // Create the data table.
+  var data = new google.visualization.arrayToDataTable([
+    ["Measure", "Score", { role: 'style' }],
+    ["Overall", scores[0], markerColorArr[scores[0] - 1]],
+    ["Inspections", scores[1], markerColorArr[scores[1] - 1]],
+    ["Staffing", scores[2], markerColorArr[scores[2] - 1]],
+    ["Nurses", scores[3], markerColorArr[scores[3] -1]]
+  ]);
+
+  // Set chart options
+  var options = {'title': title,
+                 'width':300,
+                 'height':150};
+
+  // Instantiate and draw our chart, passing in some options.
+  var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
+}
+
+/*
 // Create empty, default bar chart
 var barChartData = {
   labels : ["Overall", "Inspections", "Staffing", "Nurses"],
@@ -59,22 +93,26 @@ var barChartOptions = {
   scaleStepWidth: 1,
   scaleStartValue: 0
 };
+*/
 
 medicareLayer.on('click', function(e) {
-  var facility_data = barChartData;
+  //var facility_data = barChartData;
   var feature = e.layer.feature;
   ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
-  facility_data.datasets[0].data = ret_data;
+  //facility_data.datasets[0].data = ret_data;
 
   // Center map on the clicked marker
   map.panTo(e.layer.getLatLng());
 
+  /*
   // Check if bar exists, if so, destroy
   if (ctx_bar) {
     ctx_bar.destroy();
   }
   var ctx = document.getElementById("canvas").getContext("2d");
   var ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
+  */
+  drawChart(ret_data, feature.properties.title);
 });
 
 // Callback for loading nursing homes from Medicare Socrata API
@@ -113,7 +151,7 @@ function handleMedicareResponse(responses) {
                                      "<b>Health Inspection:</b> " + facility.health_inspection_rating + "<br>" +
                                      "<b>Staffing:</b> " + facility.staffing_rating + "<br>" +
                                      "<b>RN Staffing:</b> " + facility.rn_staffing_rating; */
-                                     
+
     fac_geo.properties.description = "<b>Phone Number:</b> " + phone + "<br>";
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
