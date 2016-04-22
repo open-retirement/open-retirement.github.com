@@ -8,6 +8,24 @@ var map = L.mapbox.map('map', 'mapbox.light', {
 var medicareLayer = L.mapbox.featureLayer().addTo(map);
 map.legendControl.addLegend(document.getElementById('legend').innerHTML);
 
+// Custom tooltip: https://www.mapbox.com/mapbox.js/example/v1.0.0/custom-marker-tooltip/
+// Add custom popups to each using our custom feature properties
+medicareLayer.on('layeradd', function(e) {
+    var marker = e.layer;
+    var feature = marker.feature;
+
+    // Create custom popup content
+    var popupContent =  "<div class='marker-title'>" + feature.properties.title + "</div>" +
+                        "<canvas id='canvas'></canvas>" +
+                        feature.properties.description;
+
+    // http://leafletjs.com/reference.html#popup
+    marker.bindPopup(popupContent,{
+        closeButton: true,
+        minWidth: 320
+    });
+});
+
 var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"];
 
 // Load map with default layer of all Cook County nursing homes
@@ -33,7 +51,6 @@ var barChartData = {
   ]
 };
 
-var ctx = document.getElementById("canvas").getContext("2d");
 var barChartOptions = {
   responsive : true,
   scaleOverride : true,
@@ -43,28 +60,22 @@ var barChartOptions = {
   scaleStartValue: 0
 };
 
-var ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
-
 medicareLayer.on('click', function(e) {
   var facility_data = barChartData;
   var feature = e.layer.feature;
   ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
   facility_data.datasets[0].data = ret_data;
-  ctx_bar.destroy();
-  ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
-  $("#canvas-label").text(feature.properties.title);
+
+  // Center map on the clicked marker
+  map.panTo(e.layer.getLatLng());
+
+  // Check if bar exists, if so, destroy
+  if (ctx_bar) {
+    ctx_bar.destroy();
+  }
+  var ctx = document.getElementById("canvas").getContext("2d");
+  var ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
 });
-
-/* Clear the chart data when map is moved
-map.on('move', empty);
-
-function empty() {
-  ctx_bar.destroy();
-  barChartData.datasets[0].data = [0,0,0,0];
-  ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
-  $("#canvas-label").text("Please select a facility");
-}
-*/
 
 // Callback for loading nursing homes from Medicare Socrata API
 function handleMedicareResponse(responses) {
@@ -95,12 +106,15 @@ function handleMedicareResponse(responses) {
     fac_geo.properties.title = facility.provider_name;
     // Set marker color based off of score
     fac_geo.properties['marker-color'] = markerColorArr[facility.overall_rating - 1];
+    /*
     fac_geo.properties.description = "<b>Ownership:</b> " + facility.ownership_type + "<br>" +
                                      "<b>Phone Number:</b> " + phone + "<br>" +
                                      "<b>Overall:</b> " + facility.overall_rating + "<br>" +
                                      "<b>Health Inspection:</b> " + facility.health_inspection_rating + "<br>" +
                                      "<b>Staffing:</b> " + facility.staffing_rating + "<br>" +
-                                     "<b>RN Staffing:</b> " + facility.rn_staffing_rating;
+                                     "<b>RN Staffing:</b> " + facility.rn_staffing_rating; */
+                                     
+    fac_geo.properties.description = "<b>Phone Number:</b> " + phone + "<br>";
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
                                       parseFloat(facility.location.latitude)];
