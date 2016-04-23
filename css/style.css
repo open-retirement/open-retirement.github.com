@@ -49,11 +49,22 @@ select {
   margin-bottom: 25px;
 }
 
-div#canvas-label {
-  width: 100%;
+.leaflet-popup-content {
   text-align: center;
+  font-family: "Lato", Verdana, "Verdana Ref", sans-serif;
+  text-align: center;
+}
+
+div.marker-title {
+  width: 100%;
+  font-size: 14px;
   font-weight: bold;
-  margin-top: 25px;
+}
+
+.leaflet-popup-content p {
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 0;
 }
 
 span.twitter-typeahead, input.typeahead {
@@ -75,16 +86,6 @@ span.twitter-typeahead, input.typeahead {
 
 .tt-cursor {
   background-color: #dcedf4;
-}
-
-.axis {
-  font: 10px sans-serif;
-}
-
-.axis path, .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
 }
 
 .legend label,

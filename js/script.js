@@ -15,16 +15,13 @@ medicareLayer.on('layeradd', function(e) {
     var feature = marker.feature;
 
     // Create custom popup content
-    /*
     var popupContent =  "<div class='marker-title'>" + feature.properties.title + "</div>" +
-                        "<div id='chart_div'></div>" +
-                        feature.properties.description;*/
-    var popupContent =  "<div id='chart_div'></div>" + feature.properties.description;
+                        feature.properties.description + "<div id='chart_div'></div>";
 
     // http://leafletjs.com/reference.html#popup
     marker.bindPopup(popupContent,{
         closeButton: true,
-        minWidth: 320
+        minWidth: 350
     });
 });
 
@@ -49,9 +46,7 @@ google.charts.setOnLoadCallback(function() {
   console.log("Google Charts loaded!");
 });
 
-// Callback that creates and populates a data table,
-// instantiates the pie chart, passes in the data and
-// draws it.
+// Create chart within tooltip
 function drawChart(scores, title) {
   // Create the data table.
   var data = new google.visualization.arrayToDataTable([
@@ -63,55 +58,32 @@ function drawChart(scores, title) {
   ]);
 
   // Set chart options
-  var options = {'title': title,
-                 'width':300,
-                 'height':150};
+  var options = {'width':330,
+                 'height':130,
+                 'legend': {position: 'none'},
+                 'chartArea': {
+                   'width': '80%',
+                   'height': '75%',
+                 },
+                 'vAxis': {
+                   'scaleType': 'discrete',
+                   'minValue': 0,
+                   'maxValue': 5,
+                   'ticks': [0,1,2,3,4,5]
+                 }};
 
   // Instantiate and draw our chart, passing in some options.
-  var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+  var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
   chart.draw(data, options);
 }
 
-/*
-// Create empty, default bar chart
-var barChartData = {
-  labels : ["Overall", "Inspections", "Staffing", "Nurses"],
-  datasets : [
-    {
-      fillColor : "#000080",
-      highlightFill: "#000080",
-      data : [0,0,0,0]
-    },
-  ]
-};
-
-var barChartOptions = {
-  responsive : true,
-  scaleOverride : true,
-  scaleIntegersOnly: true,
-  scaleSteps: 5,
-  scaleStepWidth: 1,
-  scaleStartValue: 0
-};
-*/
-
 medicareLayer.on('click', function(e) {
-  //var facility_data = barChartData;
   var feature = e.layer.feature;
   ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
-  //facility_data.datasets[0].data = ret_data;
 
   // Center map on the clicked marker
   map.panTo(e.layer.getLatLng());
 
-  /*
-  // Check if bar exists, if so, destroy
-  if (ctx_bar) {
-    ctx_bar.destroy();
-  }
-  var ctx = document.getElementById("canvas").getContext("2d");
-  var ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
-  */
   drawChart(ret_data, feature.properties.title);
 });
 
@@ -139,20 +111,20 @@ function handleMedicareResponse(responses) {
 
     // Getting phone number and formatting it for tooltip
     var provider_phone = facility.provider_phone_number.phone_number;
-    var phone = provider_phone.substr(0,3) + "-" + provider_phone.substr(3,3) + "-" + provider_phone.substr(6,4);
+    var phone = "(" + provider_phone.substr(0,3) + ") " + provider_phone.substr(3,3) +
+                "-" + provider_phone.substr(6,4);
 
     fac_geo.properties.title = facility.provider_name;
+
     // Set marker color based off of score
     fac_geo.properties['marker-color'] = markerColorArr[facility.overall_rating - 1];
-    /*
-    fac_geo.properties.description = "<b>Ownership:</b> " + facility.ownership_type + "<br>" +
-                                     "<b>Phone Number:</b> " + phone + "<br>" +
-                                     "<b>Overall:</b> " + facility.overall_rating + "<br>" +
-                                     "<b>Health Inspection:</b> " + facility.health_inspection_rating + "<br>" +
-                                     "<b>Staffing:</b> " + facility.staffing_rating + "<br>" +
-                                     "<b>RN Staffing:</b> " + facility.rn_staffing_rating; */
 
-    fac_geo.properties.description = "<b>Phone Number:</b> " + phone + "<br>";
+    fac_geo.properties.description = "<p><b>" + fac_geo.properties.ownership_type + "</b></p>" +
+                                     "<p>" + fac_geo.properties.street_addr + ", " +
+                                     fac_geo.properties.city + "</p>" +
+                                     "<p>" + phone + "</p>";
+
+
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
                                       parseFloat(facility.location.latitude)];
@@ -175,7 +147,7 @@ function queryPointMedicare(latlon) {
   });
 }
 
-/* Medicare search by neighborhood */
+// Medicare search by neighborhood
 
 function queryBoxMedicare(bbox) {
   // Currently querying for all codes
