@@ -12,7 +12,7 @@
     <script src="js/typeahead.bundle.min.js"></script>
     <script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script>
     <link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="js/chi_zip_boxes.js"></script>
     <link rel="stylesheet" href="css/style.css" />
         <!-- Google Tag Manager -->
@@ -59,8 +59,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <img id="logo" class="img-responsive" src="img/logo.png">
           <input class="typeahead form-control" id="zip-search" type="text" placeholder="Enter zip code">
           <input class="typeahead form-control" id="addr-search" type="text" placeholder="Enter address">
-          <div id="canvas-label">Please select a facility</div>
-          <canvas id='canvas'></canvas>
+          <h3>How do I use this?</h3>
+          <p>Search for your zip code, address, or just explore the map to find
+            nursing home ratings and information from across Cook County.</p>
+          <p>All data comes from the <a href="https://www.medicare.gov/nursinghomecompare/search.html" target="_blank">Medicare Ratings</a>
+            and more detailed breakdowns of what each score means are coming soon.</p>
         </div>
       </div>
     </div>

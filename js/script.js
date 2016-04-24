@@ -3,10 +3,34 @@ L.mapbox.accessToken = 'pk.eyJ1IjoiY25ocyIsImEiOiJjaW11eXJiamwwMmprdjdra29kcW1xb
 var map = L.mapbox.map('map', 'mapbox.light', {
     legendControl: {
       position: "bottomleft"
-    }
+    },
+    minZoom: 7
 }).setView([41.907477, -87.685913], 10);
+
 var medicareLayer = L.mapbox.featureLayer().addTo(map);
 map.legendControl.addLegend(document.getElementById('legend').innerHTML);
+
+/*
+Uncomment this to disable dragging, consider for mobile
+map.dragging.disable();
+*/
+
+// Custom tooltip: https://www.mapbox.com/mapbox.js/example/v1.0.0/custom-marker-tooltip/
+// Add custom popups to each using our custom feature properties
+medicareLayer.on('layeradd', function(e) {
+    var marker = e.layer;
+    var feature = marker.feature;
+
+    // Create custom popup content
+    var popupContent =  "<div class='marker-title'>" + feature.properties.title + "</div>" +
+                        feature.properties.description + "<div id='chart_div'></div>";
+
+    // http://leafletjs.com/reference.html#popup
+    marker.bindPopup(popupContent,{
+        closeButton: true,
+        minWidth: 350
+    });
+});
 
 var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"];
 
@@ -21,50 +45,46 @@ $(document).ready(function() {
   });
 });
 
-// Create empty, default bar chart
-var barChartData = {
-  labels : ["Overall", "Inspections", "Staffing", "Nurses"],
-  datasets : [
-    {
-      fillColor : "#000080",
-      highlightFill: "#000080",
-      data : [0,0,0,0]
-    },
-  ]
-};
+// Load the Visualization API and the corechart package.
+google.charts.load('current', {'packages':['corechart']});
 
-var ctx = document.getElementById("canvas").getContext("2d");
-var barChartOptions = {
-  responsive : true,
-  scaleOverride : true,
-  scaleIntegersOnly: true,
-  scaleSteps: 5,
-  scaleStepWidth: 1,
-  scaleStartValue: 0
-};
+// Create chart within tooltip
+function drawChart(scores, title) {
+  // Create the data table.
+  var data = new google.visualization.arrayToDataTable([
+    ["Measure", "Score", { role: 'style' }],
+    ["Overall", scores[0], markerColorArr[scores[0] - 1]],
+    ["Inspections", scores[1], markerColorArr[scores[1] - 1]],
+    ["Staffing", scores[2], markerColorArr[scores[2] - 1]],
+    ["Nurses", scores[3], markerColorArr[scores[3] -1]]
+  ]);
 
-var ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
+  // Set chart options
+  var options = {'width':330,
+                 'height':130,
+                 'legend': {position: 'none'},
+                 'chartArea': {
+                   'width': '80%',
+                   'height': '75%',
+                 },
+                 'vAxis': {
+                   'ticks': [0,1,2,3,4,5]
+                 }};
+
+  // Instantiate and draw our chart, passing in some options.
+  var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
+}
 
 medicareLayer.on('click', function(e) {
-  var facility_data = barChartData;
   var feature = e.layer.feature;
   ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
-  facility_data.datasets[0].data = ret_data;
-  ctx_bar.destroy();
-  ctx_bar = new Chart(ctx).Bar(facility_data, barChartOptions);
-  $("#canvas-label").text(feature.properties.title);
+
+  // Center map on the clicked marker
+  map.panTo(e.layer.getLatLng());
+
+  drawChart(ret_data, feature.properties.title);
 });
-
-/* Clear the chart data when map is moved
-map.on('move', empty);
-
-function empty() {
-  ctx_bar.destroy();
-  barChartData.datasets[0].data = [0,0,0,0];
-  ctx_bar = new Chart(ctx).Bar(barChartData, barChartOptions);
-  $("#canvas-label").text("Please select a facility");
-}
-*/
 
 // Callback for loading nursing homes from Medicare Socrata API
 function handleMedicareResponse(responses) {
@@ -81,7 +101,6 @@ function handleMedicareResponse(responses) {
     // Leaving these in properties as they might be used later for filtering
     fac_geo.properties.street_addr = facility.provider_address;
     fac_geo.properties.city = facility.provider_city;
-    fac_geo.properties.state = facility.provider_state;
     fac_geo.properties.ownership_type = facility.ownership_type;
     fac_geo.properties.scores = [facility.overall_rating,
                                  facility.health_inspection_rating,
@@ -90,17 +109,20 @@ function handleMedicareResponse(responses) {
 
     // Getting phone number and formatting it for tooltip
     var provider_phone = facility.provider_phone_number.phone_number;
-    var phone = provider_phone.substr(0,3) + "-" + provider_phone.substr(3,3) + "-" + provider_phone.substr(6,4);
+    var phone = "(" + provider_phone.substr(0,3) + ") " + provider_phone.substr(3,3) +
+                "-" + provider_phone.substr(6,4);
 
     fac_geo.properties.title = facility.provider_name;
+
     // Set marker color based off of score
     fac_geo.properties['marker-color'] = markerColorArr[facility.overall_rating - 1];
-    fac_geo.properties.description = "<b>Ownership:</b> " + facility.ownership_type + "<br>" +
-                                     "<b>Phone Number:</b> " + phone + "<br>" +
-                                     "<b>Overall:</b> " + facility.overall_rating + "<br>" +
-                                     "<b>Health Inspection:</b> " + facility.health_inspection_rating + "<br>" +
-                                     "<b>Staffing:</b> " + facility.staffing_rating + "<br>" +
-                                     "<b>RN Staffing:</b> " + facility.rn_staffing_rating;
+
+    fac_geo.properties.description = "<p><b>" + fac_geo.properties.ownership_type + "</b></p>" +
+                                     "<p>" + fac_geo.properties.street_addr + ", " +
+                                     fac_geo.properties.city + "</p>" +
+                                     "<p>" + phone + "</p>";
+
+
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
                                       parseFloat(facility.location.latitude)];
@@ -123,7 +145,7 @@ function queryPointMedicare(latlon) {
   });
 }
 
-/* Medicare search by neighborhood */
+// Medicare search by neighborhood
 
 function queryBoxMedicare(bbox) {
   // Currently querying for all codes
