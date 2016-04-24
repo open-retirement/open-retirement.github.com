@@ -28,7 +28,8 @@ medicareLayer.on('layeradd', function(e) {
     // http://leafletjs.com/reference.html#popup
     marker.bindPopup(popupContent,{
         closeButton: true,
-        minWidth: 350
+        minWidth: 300,
+        keepInView: true
     });
 });
 
@@ -52,16 +53,16 @@ google.charts.load('current', {'packages':['corechart']});
 function drawChart(scores, title) {
   // Create the data table.
   var data = new google.visualization.arrayToDataTable([
-    ["Measure", "Score", { role: 'style' }],
-    ["Overall", scores[0], markerColorArr[scores[0] - 1]],
-    ["Inspections", scores[1], markerColorArr[scores[1] - 1]],
-    ["Staffing", scores[2], markerColorArr[scores[2] - 1]],
-    ["Nurses", scores[3], markerColorArr[scores[3] -1]]
+    ["Measure", "Score", { role: 'style' }, { role: 'annotation' }],
+    ["Overall", scores[0], markerColorArr[scores[0] - 1], "Overall"],
+    ["Inspections", scores[1], markerColorArr[scores[1] - 1], "Inspections"],
+    ["Staffing", scores[2], markerColorArr[scores[2] - 1], "Staffing"],
+    ["Nurses", scores[3], markerColorArr[scores[3] -1], "Nurses"]
   ]);
 
   // Set chart options
-  var options = {'width':330,
-                 'height':130,
+  var options = {'width':270,
+                 'height':120,
                  'legend': {position: 'none'},
                  'chartArea': {
                    'width': '80%',
@@ -69,6 +70,17 @@ function drawChart(scores, title) {
                  },
                  'vAxis': {
                    'ticks': [0,1,2,3,4,5]
+                 },
+                 'annotations': {
+                   'alwaysOutside': true,
+                   'highContrast': false,
+                   'textStyle': {
+                     'fontName': 'Helvetica',
+                     'fontSize': 10,
+                     'bold': true,
+                     'color': '#000',
+                     'auraColor': 'none'
+                   }
                  }};
 
   // Instantiate and draw our chart, passing in some options.
