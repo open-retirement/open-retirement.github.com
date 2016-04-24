@@ -3,10 +3,17 @@ L.mapbox.accessToken = 'pk.eyJ1IjoiY25ocyIsImEiOiJjaW11eXJiamwwMmprdjdra29kcW1xb
 var map = L.mapbox.map('map', 'mapbox.light', {
     legendControl: {
       position: "bottomleft"
-    }
+    },
+    minZoom: 7
 }).setView([41.907477, -87.685913], 10);
+
 var medicareLayer = L.mapbox.featureLayer().addTo(map);
 map.legendControl.addLegend(document.getElementById('legend').innerHTML);
+
+/*
+Uncomment this to disable dragging, consider for mobile
+map.dragging.disable();
+*/
 
 // Custom tooltip: https://www.mapbox.com/mapbox.js/example/v1.0.0/custom-marker-tooltip/
 // Add custom popups to each using our custom feature properties
@@ -41,11 +48,6 @@ $(document).ready(function() {
 // Load the Visualization API and the corechart package.
 google.charts.load('current', {'packages':['corechart']});
 
-// Set a callback to run when the Google Visualization API is loaded.
-google.charts.setOnLoadCallback(function() {
-  console.log("Google Charts loaded!");
-});
-
 // Create chart within tooltip
 function drawChart(scores, title) {
   // Create the data table.
@@ -66,9 +68,6 @@ function drawChart(scores, title) {
                    'height': '75%',
                  },
                  'vAxis': {
-                   'scaleType': 'discrete',
-                   'minValue': 0,
-                   'maxValue': 5,
                    'ticks': [0,1,2,3,4,5]
                  }};
 
@@ -102,7 +101,6 @@ function handleMedicareResponse(responses) {
     // Leaving these in properties as they might be used later for filtering
     fac_geo.properties.street_addr = facility.provider_address;
     fac_geo.properties.city = facility.provider_city;
-    fac_geo.properties.state = facility.provider_state;
     fac_geo.properties.ownership_type = facility.ownership_type;
     fac_geo.properties.scores = [facility.overall_rating,
                                  facility.health_inspection_rating,
