@@ -67,9 +67,32 @@ div.marker-title {
   margin-bottom: 0;
 }
 
-span.twitter-typeahead, input.typeahead {
+span.twitter-typeahead {
+  width: 80%;
+  margin-top: 10px;
+}
+
+input.typeahead {
   width: 100%;
   margin-top: 10px;
+}
+
+.search-container {
+  width: 100%;
+}
+
+#search {
+  height: 34px;
+  width: 34px;
+  border-radius: 4px;
+  border-width: 1px;
+  background-color: #f9f9f9;
+  padding: 0;
+}
+
+#search img {
+  height: 20px;
+  width: 20px;
 }
 
 .tt-menu {

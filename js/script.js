@@ -42,8 +42,39 @@ $(document).ready(function() {
   $.ajax({
       url: query_string,
       dataType: "json",
-      success: handleMedicareResponse
+      success: function(responses) {
+        handleMedicareResponse(responses, true);
+      }
   });
+});
+
+// Set up bounding boxes for zip codes
+var chi_boxes = chi_zip.features.map(function(geo) {
+  var geo_box = {};
+  geo_box.gid = geo.properties.gid;
+  geo_box.category = "zip";
+  geo_box.name = geo.properties.zip;
+  geo_box.coordinates = [geo.geometry.coordinates[0][1].reverse(), geo.geometry.coordinates[0][3].reverse()];
+  // Manually calculate center of box
+  geo_box.center = [(geo_box.coordinates[0][0] + geo_box.coordinates[1][0]) / 2, (geo_box.coordinates[0][1] + geo_box.coordinates[1][1]) / 2];
+  return geo_box;
+});
+
+// Create Bloodhound objects for autocomplete
+var addr_matches = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  local: chi_boxes
+});
+
+$('#addr-search').typeahead({
+  highlight: true,
+  hint: false
+},
+{
+  name: 'addresses',
+  displayKey: 'name',
+  source: addr_matches
 });
 
 // Load the Visualization API and the corechart package.
@@ -99,7 +130,8 @@ medicareLayer.on('click', function(e) {
 });
 
 // Callback for loading nursing homes from Medicare Socrata API
-function handleMedicareResponse(responses) {
+function handleMedicareResponse(responses, initial) {
+  initial = initial || false;
   var markerArray = [];
   var fac_geo_agg = responses.map(function(facility) {
     var fac_geo = {
@@ -134,7 +166,6 @@ function handleMedicareResponse(responses) {
                                      fac_geo.properties.city + "</p>" +
                                      "<p>" + phone + "</p>";
 
-
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
                                       parseFloat(facility.location.latitude)];
@@ -142,6 +173,19 @@ function handleMedicareResponse(responses) {
     }
   });
   medicareLayer.setGeoJSON(markerArray);
+
+  // Check if initial flag is set, then load the name matching providers
+  if (initial === true) {
+    // Create array with title added (for Bloodhound)
+    // Add item as single point to GeoJSON layer in callback
+    match_providers = markerArray.map(function(p) {
+      p.name = p.properties.title;
+      p.category = "provider";
+      return p;
+    });
+
+    addr_matches.add(match_providers);
+  }
 }
 
 // Functions for querying by address point and neighborhood
@@ -179,51 +223,7 @@ var mapzen_key = "search-Cq8H0_o";
 var auto_url = 'https://search.mapzen.com/v1/autocomplete';
 var search_url = 'https://search.mapzen.com/v1/search';
 
-// Set up bounding boxes for zip codes
-
-var chi_boxes = chi_zip.features.map(function(geo) {
-  var geo_box = {};
-  geo_box.gid = geo.properties.gid;
-  geo_box.zip = geo.properties.zip;
-  geo_box.coordinates = [geo.geometry.coordinates[0][1].reverse(), geo.geometry.coordinates[0][3].reverse()];
-  geo_box.center = [(geo_box.coordinates[0][0] + geo_box.coordinates[1][0]) / 2, (geo_box.coordinates[0][1] + geo_box.coordinates[1][1]) / 2];
-  return geo_box;
-});
-
-// Create Bloodhound objects for autocomplete for zip and address
-
-var zip_matches = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("zip"),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  local: chi_boxes
-});
-
-var addr_matches = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  local: []
-});
-
-$('#addr-search').typeahead({
-  highlight: true
-},
-{
-  name: 'addresses',
-  displayKey: 'name',
-  source: addr_matches
-});
-
-$('#zip-search').typeahead({
-  highlight: true
-},
-{
-  name: 'zips',
-  displayKey: 'zip',
-  source: zip_matches
-});
-
 // Determines which Mapzen endpoint to query based on parameter
-
 function searchAddress(submitAddr) {
   var params = {
     api_key: mapzen_key,
@@ -241,7 +241,6 @@ function searchAddress(submitAddr) {
 }
 
 // Call Mapzen API, handle responses
-
 function callMapzen(url, search_params) {
   $.ajax({
     url: url,
@@ -250,8 +249,12 @@ function callMapzen(url, search_params) {
     success: function(data) {
       if (url === auto_url && data.features.length > 0) {
         addr_matches.clear();
+        // Re-add zip codes and name matches
+        addr_matches.add(chi_boxes);
+        addr_matches.add(match_providers);
         addr_matches.add(data.features.map(function(addr) {
           addr.name = addr.properties.label;
+          addr.category = "address";
           return addr;
         }));
       }
@@ -269,34 +272,37 @@ function callMapzen(url, search_params) {
 }
 
 // Create event listeners on both inputs
-
 inputElement.addEventListener('keyup', throttle(searchAddress, API_RATE_LIMIT));
 
 $('#addr-search').bind('typeahead:select', function(ev, data) {
-  map.setView([data.geometry.coordinates[1], data.geometry.coordinates[0]], 14);
-  queryPointMedicare(data.geometry.coordinates);
-});
-
-$("#addr-search").keyup(function (e) {
-  if (e.keyCode == 13) {
-    searchAddress(true);
+  if (data.category === "address") {
+    map.setView([data.geometry.coordinates[1], data.geometry.coordinates[0]], 14);
+    queryPointMedicare(data.geometry.coordinates);
+  }
+  else if (data.category === "zip") {
+    map.setView(data.center, 14);
+    queryBoxMedicare(data.coordinates);
+  }
+  else if (data.category === "provider") {
+    medicareLayer.setGeoJSON([data]);
+    map.setView(data.geometry.coordinates.reverse(), 14);
   }
 });
 
-$('#zip-search').bind('typeahead:select', function(ev, data) {
-  map.setView(data.center, 14);
-  queryBoxMedicare(data.coordinates);
-});
-
-$("#zip-search").keyup(function (e) {
-  if (e.keyCode == 13) {
-    var zip_val = document.getElementById("zip-search").value;
+var searchButton = document.getElementById("search");
+searchButton.addEventListener("click", function(e) {
+  // Check if value is zip code, if so search against that
+  if (inputElement.value.match('[0-9]{5}')) {
+    zip_val = inputElement.value;
     for (var i = 0; i < chi_boxes.length; ++i) {
       if (chi_boxes[i].zip === zip_val) {
         map.setView(chi_boxes[i].center, 14);
         queryBoxMedicare(chi_boxes[i].coordinates);
       }
     }
+  }
+  else {
+    searchAddress(true);
   }
 });
 
