@@ -134,7 +134,6 @@ function handleMedicareResponse(responses) {
                                      fac_geo.properties.city + "</p>" +
                                      "<p>" + phone + "</p>";
 
-
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
                                       parseFloat(facility.location.latitude)];
@@ -184,24 +183,18 @@ var search_url = 'https://search.mapzen.com/v1/search';
 var chi_boxes = chi_zip.features.map(function(geo) {
   var geo_box = {};
   geo_box.gid = geo.properties.gid;
-  geo_box.zip = geo.properties.zip;
+  geo_box.type = "zip";
+  geo_box.name = geo.properties.zip;
   geo_box.coordinates = [geo.geometry.coordinates[0][1].reverse(), geo.geometry.coordinates[0][3].reverse()];
   geo_box.center = [(geo_box.coordinates[0][0] + geo_box.coordinates[1][0]) / 2, (geo_box.coordinates[0][1] + geo_box.coordinates[1][1]) / 2];
   return geo_box;
 });
 
-// Create Bloodhound objects for autocomplete for zip and address
-
-var zip_matches = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("zip"),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  local: chi_boxes
-});
-
+// Create Bloodhound objects for autocomplete
 var addr_matches = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
-  local: []
+  local: chi_boxes
 });
 
 $('#addr-search').typeahead({
@@ -211,15 +204,6 @@ $('#addr-search').typeahead({
   name: 'addresses',
   displayKey: 'name',
   source: addr_matches
-});
-
-$('#zip-search').typeahead({
-  highlight: true
-},
-{
-  name: 'zips',
-  displayKey: 'zip',
-  source: zip_matches
 });
 
 // Determines which Mapzen endpoint to query based on parameter
@@ -250,8 +234,11 @@ function callMapzen(url, search_params) {
     success: function(data) {
       if (url === auto_url && data.features.length > 0) {
         addr_matches.clear();
+        // Re-add zip codes
+        addr_matches.add(chi_boxes);
         addr_matches.add(data.features.map(function(addr) {
           addr.name = addr.properties.label;
+          addr.type = "address";
           return addr;
         }));
       }
@@ -273,29 +260,29 @@ function callMapzen(url, search_params) {
 inputElement.addEventListener('keyup', throttle(searchAddress, API_RATE_LIMIT));
 
 $('#addr-search').bind('typeahead:select', function(ev, data) {
-  map.setView([data.geometry.coordinates[1], data.geometry.coordinates[0]], 14);
-  queryPointMedicare(data.geometry.coordinates);
+  if (data.type === "address") {
+    map.setView([data.geometry.coordinates[1], data.geometry.coordinates[0]], 14);
+    queryPointMedicare(data.geometry.coordinates);
+  }
+  else if (data.type === "zip") {
+    map.setView(data.center, 14);
+    queryBoxMedicare(data.coordinates);
+  }
 });
 
 $("#addr-search").keyup(function (e) {
   if (e.keyCode == 13) {
-    searchAddress(true);
-  }
-});
-
-$('#zip-search').bind('typeahead:select', function(ev, data) {
-  map.setView(data.center, 14);
-  queryBoxMedicare(data.coordinates);
-});
-
-$("#zip-search").keyup(function (e) {
-  if (e.keyCode == 13) {
-    var zip_val = document.getElementById("zip-search").value;
-    for (var i = 0; i < chi_boxes.length; ++i) {
-      if (chi_boxes[i].zip === zip_val) {
-        map.setView(chi_boxes[i].center, 14);
-        queryBoxMedicare(chi_boxes[i].coordinates);
+    if (inputElement.value.match('[0-9]{5}')) {
+      zip_val = inputElement.value;
+      for (var i = 0; i < chi_boxes.length; ++i) {
+        if (chi_boxes[i].zip === zip_val) {
+          map.setView(chi_boxes[i].center, 14);
+          queryBoxMedicare(chi_boxes[i].coordinates);
+        }
       }
+    }
+    else {
+      searchAddress(true);
     }
   }
 });
