@@ -271,6 +271,13 @@ function callMapzen(url, search_params) {
   });
 }
 
+function screenReturnToTop() {
+  // Return to top of page if search is on bottom
+  if (document.documentElement.clientWidth < 780) {
+    window.scrollTo(0,0);
+  }
+}
+
 // Create event listeners on both inputs
 inputElement.addEventListener('keyup', throttle(searchAddress, API_RATE_LIMIT));
 
@@ -287,6 +294,8 @@ $('#addr-search').bind('typeahead:select', function(ev, data) {
     medicareLayer.setGeoJSON([data]);
     map.setView(data.geometry.coordinates.reverse(), 14);
   }
+
+  screenReturnToTop();
 });
 
 var searchButton = document.getElementById("search");
@@ -304,6 +313,8 @@ searchButton.addEventListener("click", function(e) {
   else {
     searchAddress(true);
   }
+
+  screenReturnToTop();
 });
 
 /*
