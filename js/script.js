@@ -304,7 +304,7 @@ searchButton.addEventListener("click", function(e) {
   if (inputElement.value.match('[0-9]{5}')) {
     zip_val = inputElement.value;
     for (var i = 0; i < chi_boxes.length; ++i) {
-      if (chi_boxes[i].zip === zip_val) {
+      if (chi_boxes[i].name === zip_val) {
         map.setView(chi_boxes[i].center, 14);
         queryBoxMedicare(chi_boxes[i].coordinates);
       }
