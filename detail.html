@@ -37,64 +37,39 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       </div>
     </nav>
     <div class="container" id="main">
-      <div class="row">
-        <div class="col-sm-8 col-sm-push-4">
-          <div id='legend' style='display:none;'>
-            <strong>Nursing Homes by Overall Score</strong>
-            <nav class='legend clearfix'>
-              <span style='background:#d7191c;'></span>
-              <span style='background:#fdae61;'></span>
-              <span style='background:#ffffbf;'></span>
-              <span style='background:#a6d96a;'></span>
-              <span style='background:#1a9641;'></span>
-              <label>1</label>
-              <label>2</label>
-              <label>3</label>
-              <label>4</label>
-              <label>5</label>
-              <small>Source: <a href="https://data.medicare.gov/" target="_blank">Medicare Open Data</a></small>
-          </div>
-          <div id="map"></div>
-        </div>
-        <div class="col-sm-4 col-sm-pull-8">
-          <img id="logo" class="img-responsive" src="img/logo.png">
-          <div class="search-container">
-            <input class="typeahead form-control" id="addr-search" type="text" placeholder="Enter address, zip, or provider name">
-            <button id="search"><img src="img/search_icon.svg"></button>
-          </div>
-          <h3>How do I use this?</h3>
-          <p>Search for your zip code, address, or just explore the map to find
-            nursing home ratings and information from across Cook County. Red pins represent the lowest rated facilities and green pins mark the highest.</p>
-          <p>When you click on a pin you'll see more detail on that nursing home's ratings. These ratings come from <a href="https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py" target="_blank">Medicare</a>. You can see how each facility is doing on staffing levels, nurse staffing levels and how the facility compares on health and safety inspections conducted by the <a href="http://www.dph.illinois.gov/topics-services/health-care-regulation/nursing-homes" target="_blank">state</a>.</p>
-        </div>
-      </div>
     </div>
     <script id="detail-template" type="text/x-handlebars-template">
       <div class="row">
-        <div class="col-sm-8 col-sm-push-4">
-          <div id='legend' style='display:none;'>
-          </div>
-          <h1>{{title}}</h1>
-          <ul>
-            {{#names}}
-                <li>{{name}}</li>
-            {{/names}}
-          </ul>
-        </div>
-        <div class="col-sm-4 col-sm-pull-8">
-          <img id="logo" class="img-responsive" src="img/logo.png">
-          <div class="search-container">
-            <input class="typeahead form-control" id="addr-search" type="text" placeholder="Enter address, zip, or provider name">
-            <button id="search"><img src="img/search_icon.svg"></button>
-          </div>
-          <h3>How do I use this?</h3>
-          <p>Search for your zip code, address, or just explore the map to find
-            nursing home ratings and information from across Cook County. Red pins represent the lowest rated facilities and green pins mark the highest.</p>
-          <p>When you click on a pin you'll see more detail on that nursing home's ratings. These ratings come from <a href="https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py" target="_blank">Medicare</a>. You can see how each facility is doing on staffing levels, nurse staffing levels and how the facility compares on health and safety inspections conducted by the <a href="http://www.dph.illinois.gov/topics-services/health-care-regulation/nursing-homes" target="_blank">state</a>.</p>
+        <div class="col-md-6 col-md-offset-3">
+          <h2>{{provider_name}}</h2>
+          <div id="chart_div"></div>
+          <p>{{provider_name}} in {{provider_city}}, {{provider_state}} has an Overall
+            Rating of <b>{{overall_description}}</b>. See below for the measures
+            that make up that rating.
+          </p>
+          <h3>Overall: {{overall_rating}}</h3>
+          <p>Explanation of what the rating is, what measures make up the rating,
+            where it comes from, why it's important, how to consider it in your
+            nursing home search.
+          </p>
+          <h3>Inspections: {{health_inspection_rating}}</h3>
+          <p>Explanation of what the rating is, what measures make up the rating,
+            where it comes from, why it's important, how to consider it in your
+            nursing home search.
+          </p>
+          <h3>Staffing: {{staffing_rating}}</h3>
+          <p>Explanation of what the rating is, what measures make up the rating,
+            where it comes from, why it's important, how to consider it in your
+            nursing home search.
+          </p>
+          <h3>Nurses: {{rn_staffing_rating}}</h3>
+          <p>Explanation of what the rating is, what measures make up the rating,
+            where it comes from, why it's important, how to consider it in your
+            nursing home search.
+          </p>
         </div>
       </div>
     </script>
   </body>
-  <script src="js/script.js" type="text/javascript"></script>
   <script src="js/detail.js" type="text/javascript"></script>
 </html>
