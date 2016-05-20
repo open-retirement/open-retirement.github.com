@@ -36,17 +36,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </ul>
       </div>
     </nav>
-    <div class="container" id="main">
+    <div class="container detail" id="main">
     </div>
     <script id="detail-template" type="text/x-handlebars-template">
-      <div class="row">
-        <div class="col-md-6 col-md-offset-3">
+      <div class="row title">
+        <div class="col-sm-12">
           <h2>{{provider_name}}</h2>
-          <div id="chart_div"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <h3>Medicare Ratings</h3>
+          <div id="detail_chart"></div>
+        </div>
+        <div class="col-sm-6">
+          <h3>Summary</h3>
           <p>{{provider_name}} in {{provider_city}}, {{provider_state}} has an Overall
             Rating of <b>{{overall_description}}</b>. See below for the measures
             that make up that rating.
           </p>
+          <p>{{provider_address}}, {{provider_city}}</p>
+          <p>{{phone}}</p>
+          <p>{{ownership_type}}</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
           <h3>Overall: {{overall_rating}}</h3>
           <p>Explanation of what the rating is, what measures make up the rating,
             where it comes from, why it's important, how to consider it in your

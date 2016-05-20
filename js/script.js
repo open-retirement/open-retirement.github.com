@@ -22,8 +22,10 @@ medicareLayer.on('layeradd', function(e) {
     var feature = marker.feature;
 
     // Create custom popup content
-    var popupContent =  "<div class='marker-title'>" + feature.properties.title + "</div>" +
-                        feature.properties.description + "<div id='chart_div'></div>";
+    var popupContent =  "<div class='marker-title'><a href='/detail.html?" +
+                        feature.properties.federal_provider_number + "'>" +
+                        feature.properties.title + "</a></div>" +
+                        feature.properties.description;
 
     // http://leafletjs.com/reference.html#popup
     marker.bindPopup(popupContent,{
@@ -77,56 +79,12 @@ $('#addr-search').typeahead({
   source: addr_matches
 });
 
-// Load the Visualization API and the corechart package.
-google.charts.load('current', {'packages':['corechart']});
-
-// Create chart within tooltip
-function drawChart(scores, title) {
-  // Create the data table.
-  var data = new google.visualization.arrayToDataTable([
-    ["Measure", "Score", { role: 'style' }, { role: 'annotation' }],
-    ["Overall", scores[0], markerColorArr[scores[0] - 1], "Overall"],
-    ["Inspections", scores[1], markerColorArr[scores[1] - 1], "Inspections"],
-    ["Staffing", scores[2], markerColorArr[scores[2] - 1], "Staffing"],
-    ["Nurses", scores[3], markerColorArr[scores[3] -1], "Nurses"]
-  ]);
-
-  // Set chart options
-  var options = {'width':270,
-                 'height':120,
-                 'legend': {position: 'none'},
-                 'chartArea': {
-                   'width': '80%',
-                   'height': '75%',
-                 },
-                 'vAxis': {
-                   'ticks': [0,1,2,3,4,5]
-                 },
-                 'annotations': {
-                   'alwaysOutside': true,
-                   'highContrast': false,
-                   'textStyle': {
-                     'fontName': 'Helvetica',
-                     'fontSize': 10,
-                     'bold': true,
-                     'color': '#000',
-                     'auraColor': 'none'
-                   }
-                 }};
-
-  // Instantiate and draw our chart, passing in some options.
-  var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-  chart.draw(data, options);
-}
-
 medicareLayer.on('click', function(e) {
   var feature = e.layer.feature;
   ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
 
   // Center map on the clicked marker
   map.panTo(e.layer.getLatLng());
-
-  drawChart(ret_data, feature.properties.title);
 });
 
 // Callback for loading nursing homes from Medicare Socrata API
@@ -144,12 +102,19 @@ function handleMedicareResponse(responses, initial) {
     };
     // Leaving these in properties as they might be used later for filtering
     fac_geo.properties.street_addr = facility.provider_address;
+    fac_geo.properties.federal_provider_number = facility.federal_provider_number;
     fac_geo.properties.city = facility.provider_city;
     fac_geo.properties.ownership_type = facility.ownership_type;
     fac_geo.properties.scores = [facility.overall_rating,
                                  facility.health_inspection_rating,
                                  facility.staffing_rating,
                                  facility.rn_staffing_rating];
+
+    for (var i = 0; i < fac_geo.properties.scores.length; ++i) {
+      if (fac_geo.properties.scores[i] === undefined || fac_geo.properties.scores[i] === null) {
+        fac_geo.properties.scores[i] = "N/A";
+      }
+    }
 
     // Getting phone number and formatting it for tooltip
     var provider_phone = facility.provider_phone_number.phone_number;
@@ -161,10 +126,19 @@ function handleMedicareResponse(responses, initial) {
     // Set marker color based off of score
     fac_geo.properties['marker-color'] = markerColorArr[facility.overall_rating - 1];
 
-    fac_geo.properties.description = "<p><b>" + fac_geo.properties.ownership_type + "</b></p>" +
+    fac_geo.properties.description = "<div class='popup-left'>" +
                                      "<p>" + fac_geo.properties.street_addr + ", " +
                                      fac_geo.properties.city + "</p>" +
-                                     "<p>" + phone + "</p>";
+                                     "<p>" + phone + "</p>" +
+                                     "<p>" + fac_geo.properties.ownership_type +
+                                     "</p></div>" +
+                                     "<div class='popup-right'><table>" +
+                                     "<tr><th>Category</th><th class='td-right'>Rating</th></tr>" +
+                                     "<tr><td>Overall</td><td class='td-right'>" + fac_geo.properties.scores[0] + "</td></tr>" +
+                                     "<tr><td>Inspections</td><td class='td-right'>" + fac_geo.properties.scores[1] + "</td></tr>" +
+                                     "<tr><td>Staffing</td><td class='td-right'>" + fac_geo.properties.scores[2] + "</td></tr>" +
+                                     "<tr><td>Nurses</td><td class='td-right'>" + fac_geo.properties.scores[3] + "</td></tr>" +
+                                     "</table></div><p style='clear:both;'></p>";
 
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
