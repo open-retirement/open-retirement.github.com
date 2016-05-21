@@ -1,0 +1,14 @@
+{
+  "name": "chicago-nursing-homes",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "bower_components"
+  ],
+  "dependencies": {
+    "jquery": "~1.12.4",
+    "mapbox.js": "~2.4.0",
+    "typeahead.js": "~0.11.1",
+    "handlebars": "~4.0.5"
+  }
+}
