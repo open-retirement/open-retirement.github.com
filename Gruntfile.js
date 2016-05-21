@@ -3,8 +3,8 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     bower_concat: {
       all: {
-        dest: 'build/_bower.js',
-        cssDest: 'build/_bower.css',
+        dest: 'build/bower.js',
+        cssDest: 'build/bower.css',
         bowerOptions: {
           relative: false
         },
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
           'build/build.min.css': [
             'css/bootstrap/bootstrap-theme.min.css',
             'css/bootstrap/bootstrap.min.css',
-            'build/_bower.css'
+            'build/bower.css'
           ]
         }
       }
