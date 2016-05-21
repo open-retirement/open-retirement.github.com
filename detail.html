@@ -50,7 +50,8 @@
           <h3>Summary</h3>
           <p>{{provider_name}} in {{provider_city}}, {{provider_state}} has an Overall
             Rating of <b>{{overall_description}}</b>. See below for the measures
-            that make up that rating.
+            that make up that rating. Descriptions from <a href="https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/fsqrs.html"
+            target="_blank">Medicare</a>.
           </p>
           <p>{{provider_address}}, {{provider_city}}</p>
           <p>{{phone}}</p>
@@ -60,24 +61,37 @@
       <div class="row">
         <div class="col-sm-12">
           <h3>Overall: {{overall_rating}}</h3>
-          <p>Explanation of what the rating is, what measures make up the rating,
-            where it comes from, why it's important, how to consider it in your
-            nursing home search.
+          <p>The overall rating is generated through a process described <a href="https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/fsqrs.html"
+            target="_blank">by Medicare</a>. They start from the health inspection
+            rating, and then generate the score by weighing in other factors as well.
+            It is worth noting that we have chosen not to include the Quality Measure
+            (QM) rating as it is entirely self-reported, but the QM rating is part
+            of the process for creating the overall rating.
           </p>
           <h3>Inspections: {{health_inspection_rating}}</h3>
-          <p>Explanation of what the rating is, what measures make up the rating,
-            where it comes from, why it's important, how to consider it in your
-            nursing home search.
+          <p>The health inspection rating contains information from the last 3 years
+            of onsite inspections, including both standard surveys and any complaint
+            surveys. This information is gathered by trained, objective inspectors
+            who go onsite to the nursing home and follow a specific process to
+            determine the extent to which a nursing home has met Medicaid and
+            Medicare’s minimum quality requirements.  The most recent survey findings
+            are weighted more than the prior two years.  More than 180,000 onsite
+            reviews are used in the health inspection scoring nationally.
           </p>
           <h3>Staffing: {{staffing_rating}}</h3>
-          <p>Explanation of what the rating is, what measures make up the rating,
-            where it comes from, why it's important, how to consider it in your
-            nursing home search.
+          <p>The staffing rating has information about the number of hours of care
+            provided on average to each resident each day by nursing staff. This
+            rating considers differences in the levels of residents' care need in
+            each nursing home. For example, a nursing home with residents who had
+            more severe needs would be expected to have more nursing staff than a
+            nursing home where the resident needs were not as high. All information
+            on staffing is submitted by the facility.
           </p>
           <h3>Nurses: {{rn_staffing_rating}}</h3>
-          <p>Explanation of what the rating is, what measures make up the rating,
-            where it comes from, why it's important, how to consider it in your
-            nursing home search.
+          <p>The nurses rating is similar to the staffing rating, but specifically
+            to data relating to Registered Nurses (RNs). Like the general staffing
+            rating, RN staffing information is submitted by the facility and adjusted
+            for the needs of the nursing home residents.
           </p>
         </div>
       </div>

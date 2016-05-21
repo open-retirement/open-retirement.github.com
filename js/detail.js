@@ -1,3 +1,18 @@
+$(document).ready(function() {
+  // Get provider_id from URL parameter, query for it in API
+  var provider_id = window.location.search.replace(/^\?/, "");
+
+  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=" +
+                     "federal_provider_number='" + provider_id + "'";
+  $.ajax({
+      url: query_string,
+      dataType: "json",
+      success: function(response) {
+        handleIdSearch(response);
+      }
+  });
+});
+
 // Names for overall score, can be changed
 var overall_mapping = [ "Unavailable", "Poor", "Below Average", "Average",
                         "Above Average", "Excellent" ];
@@ -50,21 +65,36 @@ function drawChart(scores, title) {
   chart.draw(data, options);
 }
 
+function cleanScore(score) {
+  if (score === undefined || score === null) {
+    return "N/A";
+  }
+  else {
+    return score;
+  }
+}
 
 // Handle response from Medicare API for provider id
 function handleIdSearch(response) {
   provider = response[0];
+
+  var categories = [
+    "overall_rating",
+    "health_inspection_rating",
+    "staffing_rating",
+    "rn_staffing_rating"
+  ];
+
+  for (var i = 0; i < categories.length; ++i) {
+    provider[categories[i]] = cleanScore(provider[categories[i]]);
+  }
+
   // Assign description name based on overall rating
   provider.overall_description = overall_mapping[provider.overall_rating];
   provider.phone = provider.provider_phone_number.phone_number;
   provider.phone = "(" + provider.phone.substr(0,3) + ") " + provider.phone.substr(3,3) +
                    "-" + provider.phone.substr(6,4);
 
-  // Get template from script in page
-  var template = $('#detail-template').html();
-  var compiledTemplate = Handlebars.compile(template);
-  var result = compiledTemplate(provider);
-  $('#main').html(result);
 
   var scores = [
     provider.overall_rating,
@@ -73,24 +103,15 @@ function handleIdSearch(response) {
     provider.rn_staffing_rating
   ];
 
+  // Get template from script in page
+  var template = $('#detail-template').html();
+  var compiledTemplate = Handlebars.compile(template);
+  var result = compiledTemplate(provider);
+  $('#main').html(result);
+
   // Load the Visualization API and the corechart package.
   google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(function() {
     drawChart(scores, provider.provider_name);
   });
 }
-
-$(document).ready(function() {
-  // Get provider_id from URL parameter, query for it in API
-  var provider_id = window.location.search.replace(/^\?/, "");
-
-  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=" +
-                     "federal_provider_number='" + provider_id + "'";
-  $.ajax({
-      url: query_string,
-      dataType: "json",
-      success: function(response) {
-        handleIdSearch(response);
-      }
-  });
-});

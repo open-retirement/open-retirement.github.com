@@ -24,34 +24,19 @@ margin-right: -15px !important;
 float: right!important;
 }
 
-#main, #main .map.row, .row.map .map, #map {
-  height: 100%;
-}
-
 .row {
   padding-top: 75px;
   padding-bottom: 25px;
-}
-
-.detail .row {
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-.detail .title {
-  padding-top: 75px;
-  padding-bottom: 25px;
-}
-
-/* Make sure that articles past the first don't have large padding at top */
-.article ~ .article {
-  padding-top: 0px;
 }
 
 .img-responsive {
   width: 75%;
   margin: 0 auto;
   margin-bottom: 25px;
+}
+
+#main, #main .map.row, .row.map .map, #map {
+  height: 100%;
 }
 
 select {
@@ -73,10 +58,6 @@ select {
   margin: 0 auto;
   text-align: left;
   float: right;
-}
-
-.td-right {
-  text-align: center;
 }
 
 div.marker-title {
@@ -147,3 +128,28 @@ input.typeahead {
   font-size:9px;
   color:#808080;
 }
+
+.td-right {
+  text-align: center;
+}
+
+.detail .row {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.detail .title {
+  padding-top: 75px;
+}
+
+/* Make sure that articles past the first don't have large padding at top */
+.article ~ .article {
+  padding-top: 0px;
+}
+
+@media (max-width:991px) and (min-width:768px) {
+  /* Make sure Summary of detail page doesn't run into chart on medium size */
+  .col-sm-6 ~ .col-sm-6 {
+      padding-left: 35px;
+  }
+}​
