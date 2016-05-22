@@ -10,10 +10,15 @@ var map = L.mapbox.map('map', 'mapbox.light', {
 var medicareLayer = L.mapbox.featureLayer().addTo(map);
 map.legendControl.addLegend(document.getElementById('legend').innerHTML);
 
-/*
-Uncomment this to disable dragging, consider for mobile
-map.dragging.disable();
-*/
+// Disable dragging on mobile, allow for scroll over map
+if (document.documentElement.clientWidth < 780) {
+  map.dragging.disable();
+  if (map.tap) map.tap.disable();
+  // Make sure that mobile native scrolling on select disabled
+  $('input.typeahead').bind('focusin focus', function(e){
+    e.preventDefault();
+  });
+}
 
 // Custom tooltip: https://www.mapbox.com/mapbox.js/example/v1.0.0/custom-marker-tooltip/
 // Add custom popups to each using our custom feature properties
