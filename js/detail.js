@@ -1,4 +1,10 @@
-$(document).ready(function() {
+// Names for overall score, can be changed
+var overall_mapping = [ "Unavailable", "Poor", "Below Average", "Average",
+                        "Above Average", "Excellent" ];
+
+var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"];
+
+(function() {
   // Get provider_id from URL parameter, query for it in API
   var provider_id = window.location.search.replace(/^\?/, "");
 
@@ -11,13 +17,7 @@ $(document).ready(function() {
         handleIdSearch(response);
       }
   });
-});
-
-// Names for overall score, can be changed
-var overall_mapping = [ "Unavailable", "Poor", "Below Average", "Average",
-                        "Above Average", "Excellent" ];
-
-var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"];
+})()
 
 function drawChart(scores, title) {
   // Create the data table.
@@ -94,7 +94,6 @@ function handleIdSearch(response) {
   provider.phone = provider.provider_phone_number.phone_number;
   provider.phone = "(" + provider.phone.substr(0,3) + ") " + provider.phone.substr(3,3) +
                    "-" + provider.phone.substr(6,4);
-
 
   var scores = [
     provider.overall_rating,

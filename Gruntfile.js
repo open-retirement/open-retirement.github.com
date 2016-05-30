@@ -27,15 +27,22 @@ module.exports = function(grunt) {
     uglify: {
       my_target: {
         files: {
-          'build/bower.min.js': ['build/bower.js']
+          'build/grunt.min.js': ['build/bower.js']
         }
       }
-    }
+    },
+    concat: {
+      dist: {
+        src: ['build/grunt.min.js', 'build/turf.min.js'],
+        dest: 'build/bower.min.js',
+      },
+    },
   });
 
   grunt.loadNpmTasks('grunt-bower-concat');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
-  grunt.registerTask('default', ['bower_concat', 'cssmin', 'uglify']);
+  grunt.registerTask('default', ['bower_concat', 'cssmin', 'uglify', 'concat']);
 };

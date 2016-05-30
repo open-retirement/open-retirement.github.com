@@ -1,59 +1,15 @@
+var map;
+var medicareLayer;
+var allProviders = [];
+
+// Mapzen search functionality and details
+var API_RATE_LIMIT = 1000;
+var inputElement = document.getElementById("addr-search");
+var mapzen_key = "search-Cq8H0_o";
+var auto_url = 'https://search.mapzen.com/v1/autocomplete';
+var search_url = 'https://search.mapzen.com/v1/search';
 L.mapbox.accessToken = 'pk.eyJ1IjoiY25ocyIsImEiOiJjaW11eXJiamwwMmprdjdra29kcW1xb2J2In0.ERYma-Q2MQtY6D02V-Fobg';
-
-var map = L.mapbox.map('map', 'mapbox.light', {
-    legendControl: {
-      position: "bottomleft"
-    },
-    minZoom: 7
-}).setView([41.907477, -87.685913], 10);
-
-var medicareLayer = L.mapbox.featureLayer().addTo(map);
-map.legendControl.addLegend(document.getElementById('legend').innerHTML);
-
-// Disable dragging on mobile, allow for scroll over map
-if (document.documentElement.clientWidth < 780) {
-  map.dragging.disable();
-  if (map.tap) map.tap.disable();
-  // Make sure that mobile native scrolling on select disabled
-  $('input.typeahead').bind('focusin focus', function(e){
-    e.preventDefault();
-  });
-}
-
-// Custom tooltip: https://www.mapbox.com/mapbox.js/example/v1.0.0/custom-marker-tooltip/
-// Add custom popups to each using our custom feature properties
-medicareLayer.on('layeradd', function(e) {
-    var marker = e.layer;
-    var feature = marker.feature;
-
-    // Create custom popup content
-    var popupContent =  "<div class='marker-title'><a href='/detail.html?" +
-                        feature.properties.federal_provider_number + "'>" +
-                        feature.properties.title + "</a></div>" +
-                        feature.properties.description;
-
-    // http://leafletjs.com/reference.html#popup
-    marker.bindPopup(popupContent,{
-        closeButton: true,
-        minWidth: 300,
-        keepInView: true
-    });
-});
-
 var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"];
-
-// Load map with default layer of all Cook County nursing homes
-$(document).ready(function() {
-  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=" +
-    "provider_state='IL'&provider_county_name='Cook'";
-  $.ajax({
-      url: query_string,
-      dataType: "json",
-      success: function(responses) {
-        handleMedicareResponse(responses, true);
-      }
-  });
-});
 
 // Set up bounding boxes for zip codes
 var chi_boxes = chi_zip.features.map(function(geo) {
@@ -61,9 +17,10 @@ var chi_boxes = chi_zip.features.map(function(geo) {
   geo_box.gid = geo.properties.gid;
   geo_box.category = "zip";
   geo_box.name = geo.properties.zip;
-  geo_box.coordinates = [geo.geometry.coordinates[0][1].reverse(), geo.geometry.coordinates[0][3].reverse()];
+  geo_box.coordinates = geo.geometry.coordinates;
   // Manually calculate center of box
-  geo_box.center = [(geo_box.coordinates[0][0] + geo_box.coordinates[1][0]) / 2, (geo_box.coordinates[0][1] + geo_box.coordinates[1][1]) / 2];
+  geo_box.center = [(geo_box.coordinates[0][1][1] + geo_box.coordinates[0][3][1]) / 2,
+                    (geo_box.coordinates[0][1][0] + geo_box.coordinates[0][3][0]) / 2];
   return geo_box;
 });
 
@@ -74,28 +31,116 @@ var addr_matches = new Bloodhound({
   local: chi_boxes
 });
 
-$('#addr-search').typeahead({
-  highlight: true,
-  hint: false
-},
-{
-  name: 'addresses',
-  displayKey: 'name',
-  source: addr_matches
-});
+// Execute on page load
+(function(){
+  map = L.mapbox.map('map', 'mapbox.light', {
+      legendControl: {
+        position: "bottomleft"
+      },
+      minZoom: 7
+  }).setView([41.907477, -87.685913], 10);
 
-medicareLayer.on('click', function(e) {
-  var feature = e.layer.feature;
-  ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
+  medicareLayer = L.mapbox.featureLayer().addTo(map);
+  map.legendControl.addLegend(document.getElementById('legend').innerHTML);
 
-  // Center map on the clicked marker
-  map.panTo(e.layer.getLatLng());
-});
+  // Disable dragging on mobile, allow for scroll over map
+  if (document.documentElement.clientWidth < 780) {
+    map.dragging.disable();
+    if (map.tap) map.tap.disable();
+    // Make sure that mobile native scrolling on select disabled
+    $('input.typeahead').bind('focusin focus', function(e){
+      e.preventDefault();
+    });
+  }
+
+  // Custom tooltip: https://www.mapbox.com/mapbox.js/example/v1.0.0/custom-marker-tooltip/
+  // Add custom popups to each using our custom feature properties
+  medicareLayer.on('layeradd', function(e) {
+      var marker = e.layer;
+      var feature = marker.feature;
+
+      // Create custom popup content
+      var popupContent =  "<div class='marker-title'><a href='/detail.html?" +
+                          feature.properties.federal_provider_number + "'>" +
+                          feature.properties.title + "</a></div>" +
+                          feature.properties.description;
+
+      // http://leafletjs.com/reference.html#popup
+      marker.bindPopup(popupContent,{
+          closeButton: true,
+          minWidth: 300,
+          keepInView: true
+      });
+  });
+
+  medicareLayer.on('click', function(e) {
+    var feature = e.layer.feature;
+    ret_data = feature.properties.scores.map(function(score) {return parseFloat(score);});
+
+    // Center map on the clicked marker
+    map.panTo(e.layer.getLatLng());
+  });
+
+  // Load initial data
+  $.ajax({
+      url: "provider_info.json",
+      dataType: "json",
+      success: handleMedicareResponse
+  });
+
+  // Search DOM manipulation
+  $('#addr-search').typeahead({
+    highlight: true,
+    hint: false
+  },
+  {
+    name: 'addresses',
+    displayKey: 'name',
+    source: addr_matches
+  });
+
+  // Create event listeners on both inputs
+  inputElement.addEventListener('keyup', throttle(searchAddress, API_RATE_LIMIT));
+
+  $('#addr-search').bind('typeahead:select', function(ev, data) {
+    if (data.category === "address") {
+      map.setView([data.geometry.coordinates[1], data.geometry.coordinates[0]], 14);
+      locationQuery(data.geometry.coordinates);
+    }
+    else if (data.category === "zip") {
+      map.setView(data.center, 14);
+      locationQuery(data);
+    }
+    else if (data.category === "provider") {
+      medicareLayer.setGeoJSON([data]);
+      map.setView(data.geometry.coordinates.reverse(), 14);
+    }
+
+    screenReturnToTop();
+  });
+
+  var searchButton = document.getElementById("search");
+  searchButton.addEventListener("click", function(e) {
+    // Check if value is zip code, if so search against that
+    if (inputElement.value.match('[0-9]{5}')) {
+      zip_val = inputElement.value;
+      for (var i = 0; i < chi_boxes.length; ++i) {
+        if (chi_boxes[i].name === zip_val) {
+          map.setView(chi_boxes[i].center, 14);
+          locationQuery(chi_boxes[i]);
+        }
+      }
+    }
+    else {
+      searchAddress(true);
+    }
+
+    screenReturnToTop();
+  });
+})()
 
 // Callback for loading nursing homes from Medicare Socrata API
-function handleMedicareResponse(responses, initial) {
-  initial = initial || false;
-  var markerArray = [];
+function handleMedicareResponse(responses) {
   var fac_geo_agg = responses.map(function(facility) {
     var fac_geo = {
       type: "Feature",
@@ -105,7 +150,7 @@ function handleMedicareResponse(responses, initial) {
           coordinates: []
       }
     };
-    // Leaving these in properties as they might be used later for filtering
+
     fac_geo.properties.street_addr = facility.provider_address;
     fac_geo.properties.federal_provider_number = facility.federal_provider_number;
     fac_geo.properties.city = facility.provider_city;
@@ -122,7 +167,8 @@ function handleMedicareResponse(responses, initial) {
     }
 
     // Getting phone number and formatting it for tooltip
-    var provider_phone = facility.provider_phone_number.phone_number;
+    //var provider_phone = facility.provider_phone_number.phone_number;
+    var provider_phone = facility.provider_phone_number.toString();
     var phone = "(" + provider_phone.substr(0,3) + ") " + provider_phone.substr(3,3) +
                 "-" + provider_phone.substr(6,4);
 
@@ -139,68 +185,77 @@ function handleMedicareResponse(responses, initial) {
                                      "</p></div>" +
                                      "<div class='popup-right'><table>" +
                                      "<tr><th>Category</th><th class='td-right'>Rating</th></tr>" +
-                                     "<tr><td>Overall</td><td class='td-right'>" + fac_geo.properties.scores[0] + "</td></tr>" +
-                                     "<tr><td>Inspections</td><td class='td-right'>" + fac_geo.properties.scores[1] + "</td></tr>" +
-                                     "<tr><td>Staffing</td><td class='td-right'>" + fac_geo.properties.scores[2] + "</td></tr>" +
-                                     "<tr><td>Nurses</td><td class='td-right'>" + fac_geo.properties.scores[3] + "</td></tr>" +
+                                     "<tr><td>Overall</td><td class='td-right'>" +
+                                     fac_geo.properties.scores[0] + "</td></tr>" +
+                                     "<tr><td>Inspections</td><td class='td-right'>" +
+                                     fac_geo.properties.scores[1] + "</td></tr>" +
+                                     "<tr><td>Staffing</td><td class='td-right'>" +
+                                     fac_geo.properties.scores[2] + "</td></tr>" +
+                                     "<tr><td>Nurses</td><td class='td-right'>" +
+                                     fac_geo.properties.scores[3] + "</td></tr>" +
                                      "</table></div><p style='clear:both;'></p>";
 
+    /*
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
                                       parseFloat(facility.location.latitude)];
       markerArray.push(fac_geo);
+    }*/
+    if (!isNaN(parseFloat(facility.longitude)) && !isNaN(parseFloat(facility.latitude))) {
+      fac_geo.geometry.coordinates = [parseFloat(facility.longitude),
+                                      parseFloat(facility.latitude)];
+      allProviders.push(fac_geo);
     }
   });
-  medicareLayer.setGeoJSON(markerArray);
+  medicareLayer.setGeoJSON(allProviders);
 
-  // Check if initial flag is set, then load the name matching providers
-  if (initial === true) {
-    // Create array with title added (for Bloodhound)
-    // Add item as single point to GeoJSON layer in callback
-    match_providers = markerArray.map(function(p) {
-      p.name = p.properties.title;
-      p.category = "provider";
-      return p;
-    });
+  // Create array with title added (for Bloodhound)
+  // Add item as single point to GeoJSON layer in callback
+  match_providers = allProviders.map(function(p) {
+    p.name = p.properties.title;
+    p.category = "provider";
+    return p;
+  });
 
-    addr_matches.add(match_providers);
+  addr_matches.add(match_providers);
+}
+
+// Function for querying by address point and neighborhood
+function locationQuery(queryObj) {
+  if (queryObj.hasOwnProperty('coordinates')) {
+    var withinBoundary = {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Polygon',
+        'coordinates': queryObj.coordinates
+      },
+      'properties': {}
+    };
   }
+  else {
+    var dummyPt = {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Point',
+        'coordinates': queryObj
+      },
+      'properties': {}
+    };
+
+    var ptBuffer = turf.buffer(dummyPt, 2, 'miles');
+    // Correcting for strange error in turf that returns FeatureCollection
+    var withinBoundary = ptBuffer.features[0];
+  }
+
+  queryArr = [];
+  for (var i = 0; i < allProviders.length; ++i) {
+    //
+    if (turf.inside(allProviders[i], withinBoundary)) {
+      queryArr.push(allProviders[i]);
+    }
+  }
+  medicareLayer.setGeoJSON(queryArr);
 }
-
-// Functions for querying by address point and neighborhood
-
-function queryPointMedicare(latlon) {
-  // Currently querying for all codes
-  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=within_circle(location," +
-                     latlon[1] + "," + latlon[0] + ",1500)";
-  $.ajax({
-      url: query_string,
-      dataType: "json",
-      success: handleMedicareResponse
-  });
-}
-
-// Medicare search by neighborhood
-
-function queryBoxMedicare(bbox) {
-  // Currently querying for all codes
-  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=within_box(location," +
-                   bbox.toString() + ")";
-  $.ajax({
-      url: query_string,
-      dataType: "json",
-      success: handleMedicareResponse
-  });
-}
-
-// Mapzen search functionality and details
-
-var API_RATE_LIMIT = 1000;
-var inputElement = document.getElementById("addr-search");
-
-var mapzen_key = "search-Cq8H0_o";
-var auto_url = 'https://search.mapzen.com/v1/autocomplete';
-var search_url = 'https://search.mapzen.com/v1/search';
 
 // Determines which Mapzen endpoint to query based on parameter
 function searchAddress(submitAddr) {
@@ -240,7 +295,7 @@ function callMapzen(url, search_params) {
       else if (url === search_url) {
         if (data && data.features) {
           map.setView([data.features[0].geometry.coordinates[1], data.features[0].geometry.coordinates[0]], 14);
-          queryPointMedicare(data.features[0].geometry.coordinates);
+          locationQuery(data.features[0].geometry.coordinates);
         }
       }
     },
@@ -256,45 +311,6 @@ function screenReturnToTop() {
     window.scrollTo(0,0);
   }
 }
-
-// Create event listeners on both inputs
-inputElement.addEventListener('keyup', throttle(searchAddress, API_RATE_LIMIT));
-
-$('#addr-search').bind('typeahead:select', function(ev, data) {
-  if (data.category === "address") {
-    map.setView([data.geometry.coordinates[1], data.geometry.coordinates[0]], 14);
-    queryPointMedicare(data.geometry.coordinates);
-  }
-  else if (data.category === "zip") {
-    map.setView(data.center, 14);
-    queryBoxMedicare(data.coordinates);
-  }
-  else if (data.category === "provider") {
-    medicareLayer.setGeoJSON([data]);
-    map.setView(data.geometry.coordinates.reverse(), 14);
-  }
-
-  screenReturnToTop();
-});
-
-var searchButton = document.getElementById("search");
-searchButton.addEventListener("click", function(e) {
-  // Check if value is zip code, if so search against that
-  if (inputElement.value.match('[0-9]{5}')) {
-    zip_val = inputElement.value;
-    for (var i = 0; i < chi_boxes.length; ++i) {
-      if (chi_boxes[i].name === zip_val) {
-        map.setView(chi_boxes[i].center, 14);
-        queryBoxMedicare(chi_boxes[i].coordinates);
-      }
-    }
-  }
-  else {
-    searchAddress(true);
-  }
-
-  screenReturnToTop();
-});
 
 /*
 * throttle Utility function (borrowed from underscore)

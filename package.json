@@ -6,8 +6,9 @@
     "grunt": "^0.4.5",
     "grunt-bower-concat": "^0.6.0",
     "grunt-cli": "^0.1.13",
+    "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-cssmin": "^0.14.0",
-    "grunt-contrib-uglify": "^0.11.0"
+    "grunt-contrib-uglify": "~1.0.1"
   },
   "description": "Chicago Nursing Home Search",
   "dependencies": {},
