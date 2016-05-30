@@ -147,9 +147,19 @@ input.typeahead {
   padding-top: 0px;
 }
 
+#bottom-div {
+  padding-bottom: 30px;
+}
+
 @media (max-width:991px) and (min-width:768px) {
   /* Make sure Summary of detail page doesn't run into chart on medium size */
   .col-sm-6 ~ .col-sm-6 {
       padding-left: 35px;
   }
-}​
+}
+
+@media (max-width:767px) {
+  .img-responsive {
+    margin-bottom: 0;
+  }
+}
