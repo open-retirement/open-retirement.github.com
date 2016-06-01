@@ -151,6 +151,12 @@ input.typeahead {
   padding-bottom: 30px;
 }
 
+.star {
+  height: 20px;
+  width: 20px;
+  /*padding: 10px;*/
+}
+
 @media (max-width:991px) and (min-width:768px) {
   /* Make sure Summary of detail page doesn't run into chart on medium size */
   .col-sm-6 ~ .col-sm-6 {

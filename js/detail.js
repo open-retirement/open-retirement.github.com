@@ -65,18 +65,29 @@ function drawChart(scores, title) {
   chart.draw(data, options);
 }
 
-function cleanScore(score) {
+function readScore(score) {
   if (score === undefined || score === null) {
     return "N/A";
   }
   else {
-    return score;
+    var star_string = "";
+    for (var i = 0; i < parseInt(score); ++i) {
+      star_string += "<img src='img/star.png' class='star'>";
+    }
+    return star_string;
   }
 }
 
 // Handle response from Medicare API for provider id
 function handleIdSearch(response) {
   provider = response[0];
+
+  var scores = [
+    provider.overall_rating,
+    provider.health_inspection_rating,
+    provider.staffing_rating,
+    provider.rn_staffing_rating
+  ];
 
   var categories = [
     "overall_rating",
@@ -86,7 +97,7 @@ function handleIdSearch(response) {
   ];
 
   for (var i = 0; i < categories.length; ++i) {
-    provider[categories[i]] = cleanScore(provider[categories[i]]);
+    provider[categories[i]] = readScore(provider[categories[i]]);
   }
 
   // Assign description name based on overall rating
@@ -94,13 +105,6 @@ function handleIdSearch(response) {
   provider.phone = provider.provider_phone_number.phone_number;
   provider.phone = "(" + provider.phone.substr(0,3) + ") " + provider.phone.substr(3,3) +
                    "-" + provider.phone.substr(6,4);
-
-  var scores = [
-    provider.overall_rating,
-    provider.health_inspection_rating,
-    provider.staffing_rating,
-    provider.rn_staffing_rating
-  ];
 
   // Get template from script in page
   var template = $('#detail-template').html();
