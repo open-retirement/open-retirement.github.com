@@ -89,6 +89,9 @@ function handleIdSearch(response) {
     provider.rn_staffing_rating
   ];
 
+  // Assign description name based on overall rating
+  provider.overall_description = overall_mapping[provider.overall_rating];
+
   var categories = [
     "overall_rating",
     "health_inspection_rating",
@@ -100,8 +103,6 @@ function handleIdSearch(response) {
     provider[categories[i]] = readScore(provider[categories[i]]);
   }
 
-  // Assign description name based on overall rating
-  provider.overall_description = overall_mapping[provider.overall_rating];
   provider.phone = provider.provider_phone_number.phone_number;
   provider.phone = "(" + provider.phone.substr(0,3) + ") " + provider.phone.substr(3,3) +
                    "-" + provider.phone.substr(6,4);
