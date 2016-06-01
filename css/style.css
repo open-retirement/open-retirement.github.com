@@ -75,13 +75,11 @@ div.marker-title {
 }
 
 span.twitter-typeahead {
-  width: 80%;
-  margin-top: 10px;
+  width: 100%;
 }
 
 input.typeahead {
   width: 100%;
-  margin-top: 10px;
 }
 
 .search-container {
