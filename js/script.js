@@ -83,7 +83,8 @@ var addr_matches = new Bloodhound({
 
   // Load initial data
   $.ajax({
-      url: "provider_info.json",
+      url: "https://data.medicare.gov/resource/4pq5-n9py.json?$where=" +
+           "provider_state='IL'&provider_county_name='Cook'",
       dataType: "json",
       success: handleMedicareResponse
   });
@@ -195,17 +196,20 @@ function handleMedicareResponse(responses) {
                                      fac_geo.properties.scores[3] + "</td></tr>" +
                                      "</table></div><p style='clear:both;'></p>";
 
-    /*
+
     if (!isNaN(parseFloat(facility.location.longitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
                                       parseFloat(facility.location.latitude)];
-      markerArray.push(fac_geo);
-    }*/
+      allProviders.push(fac_geo);
+    }
+
+    // Below necessary if static JSON file is used for providers
+    /*
     if (!isNaN(parseFloat(facility.longitude)) && !isNaN(parseFloat(facility.latitude))) {
       fac_geo.geometry.coordinates = [parseFloat(facility.longitude),
                                       parseFloat(facility.latitude)];
       allProviders.push(fac_geo);
-    }
+    }*/
   });
   medicareLayer.setGeoJSON(allProviders);
 
