@@ -168,8 +168,8 @@ function handleMedicareResponse(responses) {
     }
 
     // Getting phone number and formatting it for tooltip
-    //var provider_phone = facility.provider_phone_number.phone_number;
-    var provider_phone = facility.provider_phone_number.toString();
+    var provider_phone = facility.provider_phone_number.phone_number;
+    //var provider_phone = facility.provider_phone_number.toString();
     var phone = "(" + provider_phone.substr(0,3) + ") " + provider_phone.substr(3,3) +
                 "-" + provider_phone.substr(6,4);
 
