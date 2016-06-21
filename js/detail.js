@@ -78,6 +78,27 @@ function readScore(score) {
   }
 }
 
+function getGoogleSheetData(provider_id) {
+  var google_sheet_url = "https://script.google.com/macros/s/AKfycbynJsvP-1RjSpTR9W3Y_3cl-rqQm4aq7Mry_caMKde9_WmoMVw/exec";
+  $.ajax({
+     type: "POST",
+     url: google_sheet_url,
+     dataType: "json",
+     data: {
+       "id": provider_id
+     },
+     success: function(data) {
+       $("#body-details").append(
+         "<p><b>Long Term Residents Who Received Antipsychotic Medication in Q4 2015:</b> " + data["pct_long_med_q4"] + "%</p>" +
+         "<p><b>Short Term Residents Who Newly Received Antipsychotic Medication in Q4 2015:</b> " + data["pct_long_med_q4"] + "%</p>" +
+         "<p><b>Cited for F329:</b> " + data["cited_f329"] + "</p>");
+     },
+     error: function(e) {
+       console.error(e);
+     }
+  });
+}
+
 // Handle response from Medicare API for provider id
 function handleIdSearch(response) {
   provider = response[0];
@@ -118,4 +139,6 @@ function handleIdSearch(response) {
   google.charts.setOnLoadCallback(function() {
     drawChart(scores, provider.provider_name);
   });
+
+  getGoogleSheetData(provider.federal_provider_number);
 }
