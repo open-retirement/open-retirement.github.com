@@ -3,7 +3,6 @@ var medicareLayer;
 var allProviders = [];
 
 // Mapzen search functionality and details
-var API_RATE_LIMIT = 1000;
 var inputElement = document.getElementById("addr-search");
 var mapzen_key = "search-Cq8H0_o";
 var auto_url = 'https://search.mapzen.com/v1/autocomplete';
@@ -16,7 +15,7 @@ var chi_boxes = chi_zip.features.map(function(geo) {
   var geo_box = {};
   geo_box.gid = geo.properties.gid;
   geo_box.category = "zip";
-  geo_box.name = geo.properties.zip;
+  geo_box.label = geo.properties.zip;
   geo_box.coordinates = geo.geometry.coordinates;
   // Manually calculate center of box
   geo_box.center = [(geo_box.coordinates[0][1][1] + geo_box.coordinates[0][3][1]) / 2,
@@ -24,12 +23,49 @@ var chi_boxes = chi_zip.features.map(function(geo) {
   return geo_box;
 });
 
+var match_providers = [];
+
+var full_auto_url = auto_url + "?api_key=" + mapzen_key + "&focus.point.lon=-87.63&focus.point.lat=41.88&text=";
+
 // Create Bloodhound objects for autocomplete
 var addr_matches = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("label"),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+      url: full_auto_url,
+      replace: function() {
+        var val = inputElement.value;
+        var processed_url = full_auto_url + encodeURIComponent(val);
+        return processed_url;
+      },
+      transform: function(response) {
+        response.features.map(function(addr) {
+            addr.label = addr.properties.label;
+            addr.category = "address";
+            return addr;
+          });
+        //return chi_boxes.concat(match_providers, response.features);
+        return response.features;
+      }
+    }
+});
+
+var zip_matches = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("label"),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
   local: chi_boxes
 });
+
+// Leave empty, data will be pulled from initial Socrata query
+var provider_matches = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("label"),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  local: []
+});
+
+addr_matches.initialize();
+zip_matches.initialize();
+provider_matches.initialize();
 
 // Execute on page load
 (function(){
@@ -92,16 +128,28 @@ var addr_matches = new Bloodhound({
   // Search DOM manipulation
   $('#addr-search').typeahead({
     highlight: true,
-    hint: false
+    hint: false,
+    minLength: 3
+  },
+  {
+    name: 'zips',
+    display: 'label',
+    source: zip_matches
+  },
+  {
+    name: 'providers',
+    display: 'label',
+    source: provider_matches
   },
   {
     name: 'addresses',
-    displayKey: 'name',
+    display: 'label',
     source: addr_matches
-  });
+  }
+  );
 
   // Create event listeners on both inputs
-  inputElement.addEventListener('keyup', throttle(searchAddress, API_RATE_LIMIT));
+  //inputElement.addEventListener('keyup', throttle(searchAddress, API_RATE_LIMIT));
 
   $('#addr-search').bind('typeahead:select', function(ev, data) {
     if (data.category === "address") {
@@ -126,14 +174,14 @@ var addr_matches = new Bloodhound({
     if (inputElement.value.match('[0-9]{5}')) {
       zip_val = inputElement.value;
       for (var i = 0; i < chi_boxes.length; ++i) {
-        if (chi_boxes[i].name === zip_val) {
+        if (chi_boxes[i].label === zip_val) {
           map.setView(chi_boxes[i].center, 14);
           locationQuery(chi_boxes[i]);
         }
       }
     }
     else {
-      searchAddress(true);
+      callMapzen();
     }
 
     screenReturnToTop();
@@ -216,12 +264,12 @@ function handleMedicareResponse(responses) {
   // Create array with title added (for Bloodhound)
   // Add item as single point to GeoJSON layer in callback
   match_providers = allProviders.map(function(p) {
-    p.name = p.properties.title;
+    p.label = p.properties.title;
     p.category = "provider";
     return p;
   });
 
-  addr_matches.add(match_providers);
+  provider_matches.add(match_providers);
 }
 
 // Function for querying by address point and neighborhood
@@ -261,47 +309,22 @@ function locationQuery(queryObj) {
   medicareLayer.setGeoJSON(queryArr);
 }
 
-// Determines which Mapzen endpoint to query based on parameter
-function searchAddress(submitAddr) {
-  var params = {
-    api_key: mapzen_key,
-    "focus.point.lon": -87.63,
-    "focus.point.lat": 41.88,
-    text: inputElement.value
-  };
-  // if optional argument supplied, call search endpoint
-  if (submitAddr === true) {
-    callMapzen(search_url, params);
-  }
-  else if (inputElement.value.length > 0) {
-    callMapzen(auto_url, params);
-  }
-}
-
 // Call Mapzen API, handle responses
-function callMapzen(url, search_params) {
+function callMapzen() {
   $.ajax({
-    url: url,
-    data: search_params,
+    url: search_url,
+    data: {
+      api_key: mapzen_key,
+      "focus.point.lon": -87.63,
+      "focus.point.lat": 41.88,
+      text: inputElement.value
+    },
     dataType: "json",
     success: function(data) {
-      if (url === auto_url && data.features.length > 0) {
-        addr_matches.clear();
-        // Re-add zip codes and name matches
-        addr_matches.add(chi_boxes);
-        addr_matches.add(match_providers);
-        addr_matches.add(data.features.map(function(addr) {
-          addr.name = addr.properties.label;
-          addr.category = "address";
-          return addr;
-        }));
-      }
-      else if (url === search_url) {
-        if (data && data.features) {
+      if (data && data.features) {
           map.setView([data.features[0].geometry.coordinates[1], data.features[0].geometry.coordinates[0]], 14);
           locationQuery(data.features[0].geometry.coordinates);
         }
-      }
     },
     error: function(err) {
       console.log(err);
@@ -314,39 +337,4 @@ function screenReturnToTop() {
   if (document.documentElement.clientWidth < 780) {
     window.scrollTo(0,0);
   }
-}
-
-/*
-* throttle Utility function (borrowed from underscore)
-*/
-function throttle (func, wait, options) {
-  var context, args, result;
-  var timeout = null;
-  var previous = 0;
-  if (!options) options = {};
-  var later = function () {
-    previous = options.leading === false ? 0 : new Date().getTime();
-    timeout = null;
-    result = func.apply(context, args);
-    if (!timeout) context = args = null;
-  };
-  return function () {
-    var now = new Date().getTime();
-    if (!previous && options.leading === false) previous = now;
-    var remaining = wait - (now - previous);
-    context = this;
-    args = arguments;
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      previous = now;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    } else if (!timeout && options.trailing !== false) {
-      timeout = setTimeout(later, remaining);
-    }
-    return result;
-  };
 }
