@@ -92,7 +92,7 @@ function getGoogleSheetData(provider_id) {
          "<p><b>Has Alzheimer's Unit:</b> " + data["alzheimers"] + "</p>" +
          "<p><b>Long Term Residents Who Received Antipsychotic Medication in Q4 2015:</b> " + data["pct_long_med_q4"] + "%</p>" +
          "<p><b>Short Term Residents Who Newly Received Antipsychotic Medication in Q4 2015:</b> " + data["pct_long_med_q4"] + "%</p>" +
-         "<p><b>Cited for F329:</b> " + data["cited_f329"] + "</p>");
+         "<p><b>Cited for giving residents unnecessary drugs:</b> " + data["cited_f329"] + "</p>");
      },
      error: function(e) {
        console.error(e);
