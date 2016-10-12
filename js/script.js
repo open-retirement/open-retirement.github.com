@@ -170,25 +170,63 @@ provider_matches.initialize();
     screenReturnToTop();
   });
 
+  // add a listener on the search button
   var searchButton = document.getElementById("search");
   searchButton.addEventListener("click", function(e) {
-    // Check if value is zip code, if so search against that
-    if (inputElement.value.match('[0-9]{5}')) {
-      zip_val = inputElement.value;
-      for (var i = 0; i < chi_boxes.length; ++i) {
-        if (chi_boxes[i].label === zip_val) {
-          map.setView(chi_boxes[i].center, 14);
-          locationQuery(chi_boxes[i]);
-        }
+    searchQuery();
+  });
+
+  // add another listener on the return key for searching
+  var searchBox = document.getElementById("addr-search");
+  var clearButton = document.getElementById("clearButton");
+  var clearTD = document.getElementById("clearTD");
+
+  searchBox.addEventListener("keyup", function(e) {
+    if (e.keyCode === 13) {
+      searchQuery();
+    }
+    // show clear button
+    if (hasClass(clearTD, 'hidden')) {
+      removeClass(clearTD, 'hidden');
+    }
+  });  
+
+  // listen for click on clear button
+  clearButton.addEventListener("click", function(e) {
+    // clear the value in the search box
+    searchBox.value = '';
+
+    console.log(addr_matches);
+
+    // reset the data and map
+    map.setView([41.907477, -87.685913], 10);
+    locationQuery([]);
+
+    // hide clear button
+    addClass(clearTD, 'hidden');
+
+
+  });
+
+
+})()
+
+function searchQuery() {
+  // Check if value is zip code, if so search against that
+  if (inputElement.value.match('[0-9]{5}')) {
+    zip_val = inputElement.value;
+    for (var i = 0; i < chi_boxes.length; ++i) {
+      if (chi_boxes[i].label === zip_val) {
+        map.setView(chi_boxes[i].center, 14);
+        locationQuery(chi_boxes[i]);
       }
     }
-    else {
-      callMapzen();
-    }
-
-    screenReturnToTop();
-  });
-})()
+  }
+  else {
+    callMapzen();
+  }
+  screenReturnToTop();
+}
 
 // Callback for loading nursing homes from Medicare Socrata API
 function handleMedicareResponse(responses) {
@@ -308,7 +346,14 @@ function locationQuery(queryObj) {
       queryArr.push(allProviders[i]);
     }
   }
-  medicareLayer.setGeoJSON(queryArr);
+
+  // if no search results are returned, then show all the providers
+  if (queryArr.length !== 0) {
+    medicareLayer.setGeoJSON(queryArr);
+  } else {
+    medicareLayer.setGeoJSON(allProviders);
+  }
+
 }
 
 // Call Mapzen API, handle responses
@@ -338,5 +383,20 @@ function screenReturnToTop() {
   // Return to top of page if search is on bottom
   if (document.documentElement.clientWidth < 780) {
     window.scrollTo(0,0);
+  }
+}
+
+function hasClass(ele,cls) {
+  return !!ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
+}
+
+function addClass(ele,cls) {
+  if (!hasClass(ele,cls)) ele.className += " "+cls;
+}
+
+function removeClass(ele,cls) {
+  if (hasClass(ele,cls)) {
+    var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
+    ele.className=ele.className.replace(reg,' ');
   }
 }
