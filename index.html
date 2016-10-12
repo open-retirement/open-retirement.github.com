@@ -39,6 +39,8 @@
     })(window,document,'script','dataLayer','GTM-TQPSF2');
     </script>
     <!-- End Google Tag Manager -->
+    <!-- Font Awesome -->
+    <script src="https://use.fontawesome.com/d70ddbbdd8.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -52,7 +54,31 @@
     </nav>
     <div class="container" id="main">
       <div class="row map">
-        <div class="col-sm-8 col-sm-push-4 map">
+        <div class="col-sm-4" id="bottom-div">
+          <img id="logo" class="img-responsive" src="img/logo.png">
+          <table class="search-container">
+            <tbody>
+              <tr>
+                <td>
+                  <input class="typeahead form-control" id="addr-search" type="text" placeholder="Enter address, zip, or provider name">
+                </td>
+                <td>
+                  <!--<button id="search"><img src="img/search_icon.svg"></button>-->
+                  <!-- Switching to font awesome -->
+                  <button id="search" class="searchAndClear"><i class="fa fa-search" aria-hidden="true"></i></button>
+                </td>
+                <td id="clearTD" class="hidden">
+                  <button id="clearButton" class="searchAndClear"><i class="fa fa-times" aria-hidden="true"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <h3>How do I use this?</h3>
+          <p>Search for your zip code, address, or just explore the map to find
+            nursing home ratings and information from across Cook County. Red pins represent the lowest rated facilities and green pins mark the highest.</p>
+          <p>When you click on a pin you'll see more detail on that nursing home's ratings. These ratings come from <a href="https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py" target="_blank">Medicare</a>. You can see how each facility is doing on staffing levels, nurse staffing levels and how the facility compares on health and safety inspections conducted by the <a href="http://www.dph.illinois.gov/topics-services/health-care-regulation/nursing-homes" target="_blank">state</a>.</p>
+        </div>
+        <div class="col-sm-8 map">
           <div id='legend' style='display:none;'>
             <strong>Nursing Homes by Overall Score</strong>
             <nav class='legend clearfix'>
@@ -69,25 +95,6 @@
               <small>Source: <a href="https://data.medicare.gov/" target="_blank">Medicare Open Data</a></small>
           </div>
           <div id="map"></div>
-        </div>
-        <div class="col-sm-4 col-sm-pull-8" id="bottom-div">
-          <img id="logo" class="img-responsive" src="img/logo.png">
-          <table class="search-container">
-            <tbody>
-              <tr>
-                <td>
-                  <input class="typeahead form-control" id="addr-search" type="text" placeholder="Enter address, zip, or provider name">
-                </td>
-                <td>
-                  <button id="search"><img src="img/search_icon.svg"></button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <h3>How do I use this?</h3>
-          <p>Search for your zip code, address, or just explore the map to find
-            nursing home ratings and information from across Cook County. Red pins represent the lowest rated facilities and green pins mark the highest.</p>
-          <p>When you click on a pin you'll see more detail on that nursing home's ratings. These ratings come from <a href="https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py" target="_blank">Medicare</a>. You can see how each facility is doing on staffing levels, nurse staffing levels and how the facility compares on health and safety inspections conducted by the <a href="http://www.dph.illinois.gov/topics-services/health-care-regulation/nursing-homes" target="_blank">state</a>.</p>
         </div>
       </div>
     </div>
