@@ -54,7 +54,6 @@ select {
 }
 
 .leaflet-popup-content .popup-left {
-  width: 175px;
   float: left;
 }
 

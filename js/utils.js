@@ -18,5 +18,5 @@ var readScore = function(score) {
 };
 
 var punctuatePhone = function(phone_string) {
-	return "(" + provider_phone.substr(0,3) + ") " + provider_phone.substr(3,3) + "-" + provider_phone.substr(6,4);
+	return "(" + phone_string.substr(0,3) + ") " + phone_string.substr(3,3) + "-" + phone_string.substr(6,4);
 };
