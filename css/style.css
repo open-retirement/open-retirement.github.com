@@ -45,7 +45,12 @@ select {
 
 .leaflet-popup-content {
   font-family: "Lato", Verdana, "Verdana Ref", sans-serif;
-  text-align: center;
+  font-size: 14px;
+}
+
+.leaflet-popup-content ul {
+  -webkit-padding-start: 1em;
+  -mozilla-padding-start: 1em;
 }
 
 .leaflet-popup-content .popup-left {
@@ -54,7 +59,7 @@ select {
 }
 
 .leaflet-popup-content .popup-right {
-  width: 100px;
+  min-width: 100px;
   margin: 0 auto;
   text-align: left;
   float: right;
@@ -62,7 +67,7 @@ select {
 
 div.marker-title {
   width: 100%;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   padding-bottom: 10px;
 }
@@ -72,6 +77,27 @@ div.marker-title {
   line-height: 16px;
   padding: 5px;
   margin-bottom: 0;
+}
+
+.fac_geo_overall {
+  font-size: 18px;
+}
+
+.fac_geo_overall .rating_number {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.fac_geo_breakdown {
+  font-size: 14px;
+}
+
+.popup-field {
+  text-align: right;
+}
+
+.popup-stars {
+  text-align: left;
 }
 
 span.twitter-typeahead {
