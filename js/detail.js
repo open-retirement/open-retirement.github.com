@@ -1,8 +1,6 @@
-// Names for overall score, can be changed
-var overall_mapping = [ "Unavailable", "Poor", "Below Average", "Average",
-                        "Above Average", "Excellent" ];
-
-var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"];
+var readScore;
+var overall_mapping;
+var markerColorArr;
 
 (function() {
   // Get provider_id from URL parameter, query for it in API
@@ -65,18 +63,7 @@ function drawChart(scores, title) {
   chart.draw(data, options);
 }
 
-function readScore(score) {
-  if (score === undefined || score === null) {
-    return "N/A";
-  }
-  else {
-    var star_string = "";
-    for (var i = 0; i < parseInt(score); ++i) {
-      star_string += "<img src='img/star.png' class='star'>";
-    }
-    return star_string;
-  }
-}
+
 
 function getGoogleSheetData(provider_id) {
   var google_sheet_url = "https://script.google.com/macros/s/AKfycbynJsvP-1RjSpTR9W3Y_3cl-rqQm4aq7Mry_caMKde9_WmoMVw/exec";
@@ -125,9 +112,7 @@ function handleIdSearch(response) {
     provider[categories[i]] = readScore(provider[categories[i]]);
   }
 
-  provider.phone = provider.provider_phone_number.phone_number;
-  provider.phone = "(" + provider.phone.substr(0,3) + ") " + provider.phone.substr(3,3) +
-                   "-" + provider.phone.substr(6,4);
+  provider.phone = punctuatePhone(provider.provider_phone_number.phone_number);
 
   // Get template from script in page
   var template = $('#detail-template').html();

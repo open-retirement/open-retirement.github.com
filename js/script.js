@@ -8,7 +8,6 @@ var mapzen_key = "search-Cq8H0_o";
 var auto_url = 'https://search.mapzen.com/v1/autocomplete';
 var search_url = 'https://search.mapzen.com/v1/search';
 L.mapbox.accessToken = 'pk.eyJ1IjoiY25ocyIsImEiOiJjaW11eXJiamwwMmprdjdra29kcW1xb2J2In0.ERYma-Q2MQtY6D02V-Fobg';
-var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"];
 
 // Set up bounding boxes for zip codes
 var chi_boxes = chi_zip.features.map(function(geo) {
@@ -26,6 +25,11 @@ var chi_boxes = chi_zip.features.map(function(geo) {
 var match_providers = [];
 
 var full_auto_url = auto_url + "?api_key=" + mapzen_key + "&focus.point.lon=-87.63&focus.point.lat=41.88&text=";
+
+var readScore;
+var overall_mapping;
+var markerColorArr;
+var punctuatePhone;
 
 // Create Bloodhound objects for autocomplete
 var addr_matches = new Bloodhound({
@@ -106,7 +110,7 @@ provider_matches.initialize();
       // http://leafletjs.com/reference.html#popup
       marker.bindPopup(popupContent,{
           closeButton: true,
-          minWidth: 300,
+          minWidth: 330,
           keepInView: true
       });
   });
@@ -266,22 +270,22 @@ function handleMedicareResponse(responses) {
     // Set marker color based off of score
     fac_geo.properties['marker-color'] = markerColorArr[facility.overall_rating - 1];
 
-    fac_geo.properties.description = "<div class='popup-left'>" +
-                                     "<p>" + fac_geo.properties.street_addr + ", " +
-                                     fac_geo.properties.city + "</p>" +
-                                     "<p>" + phone + "</p>" +
-                                     "<p>" + fac_geo.properties.ownership_type +
-                                     "</p></div>" +
-                                     "<div class='popup-right'><table>" +
-                                     "<tr><th>Category</th><th class='td-right'>Rating</th></tr>" +
-                                     "<tr><td>Overall</td><td class='td-right'>" +
-                                     fac_geo.properties.scores[0] + "</td></tr>" +
-                                     "<tr><td>Inspections</td><td class='td-right'>" +
-                                     fac_geo.properties.scores[1] + "</td></tr>" +
-                                     "<tr><td>Staffing</td><td class='td-right'>" +
-                                     fac_geo.properties.scores[2] + "</td></tr>" +
-                                     "<tr><td>Nurses</td><td class='td-right'>" +
-                                     fac_geo.properties.scores[3] + "</td></tr>" +
+    fac_geo.properties.description = "<div>" +
+                                     "<ul><li>" + fac_geo.properties.street_addr + ", " +
+                                     fac_geo.properties.city + "</li>" +
+                                     "<li>" + phone + "</li>" +
+                                     "<li>" + fac_geo.properties.ownership_type +
+                                     "</li></ul></div>" +
+                                     "<div class='popup-left'>" +
+                                     "<div class='fac_geo_overall'>Rating: <span class='rating_number'>" + fac_geo.properties.scores[0] + "</span></div>" +
+                                     "</div>" +
+                                     "<div class='popup-right'><table class='fac_geo_breakdown'>" +
+                                     "<tr><td class='popup-field'>Inspections</td><td class='popup-stars'>" +
+                                     readScore(fac_geo.properties.scores[1]) + "</td></tr>" +
+                                     "<tr><td class='popup-field'>Staffing</td><td class='popup-stars'>" +
+                                     readScore(fac_geo.properties.scores[2]) + "</td></tr>" +
+                                     "<tr><td class='popup-field'>Nurses</td><td class='popup-stars'>" +
+                                     readScore(fac_geo.properties.scores[3]) + "</td></tr>" +
                                      "</table></div><p style='clear:both;'></p>";
 
 
