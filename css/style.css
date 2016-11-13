@@ -160,6 +160,26 @@ input.typeahead {
   padding-top: 75px;
 }
 
+table.description {
+  margin-top: 10px;
+}
+
+table.description, table.description tbody tr {
+  width: 100%;
+  border: 10px solid transparent;
+}
+
+table.description tbody tr td:first-of-type {
+  font-weight: bold;
+}
+
+.list-data div {
+  margin-bottom: 25px;
+}
+.list-data div p span {
+  font-weight: bold;
+}
+
 /* Make sure that articles past the first don't have large padding at top */
 .article ~ .article {
   padding-top: 0px;
