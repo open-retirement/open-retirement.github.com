@@ -58,7 +58,7 @@ select {
 }
 
 .leaflet-popup-content .popup-right {
-  min-width: 100px;
+  min-width: 171px;
   margin: 0 auto;
   text-align: left;
   float: right;
@@ -83,8 +83,38 @@ div.marker-title {
 }
 
 .fac_geo_overall .rating_number {
+  display: inline-block;
   font-size: 24px;
   font-weight: 700;
+  margin-left: 5px;
+  padding: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50% 50%;
+  border: solid 2px #808080;
+  text-align: center;
+  color: #ffffff;
+}
+
+.fac_geo_overall .rating_number.rating-1 {
+  background: #d7191c;
+}
+
+.fac_geo_overall .rating_number.rating-2 {
+  background: #fdae61;
+}
+
+.fac_geo_overall .rating_number.rating-3 {
+  background: #ffffbf;
+  color: #404033;
+}
+
+.fac_geo_overall .rating_number.rating-4 {
+  background: #a6d96a;
+}
+
+.fac_geo_overall .rating_number.rating-5 {
+  background: #1a9641;
 }
 
 .fac_geo_breakdown {
@@ -93,6 +123,7 @@ div.marker-title {
 
 .popup-field {
   text-align: right;
+  margin-right: 3px;
 }
 
 .popup-stars {

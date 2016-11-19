@@ -271,7 +271,9 @@ function handleMedicareResponse(responses) {
                                      "<li>" + fac_geo.properties.ownership_type +
                                      "</li></ul></div>" +
                                      "<div class='popup-left'>" +
-                                     "<div class='fac_geo_overall'>Rating: <span class='rating_number'>" + fac_geo.properties.scores[0] + "</span></div>" +
+                                     "<div class='fac_geo_overall'>Rating: <span class='rating_number rating-" +
+                                     fac_geo.properties.scores[0] +
+                                     "'>" + fac_geo.properties.scores[0] + "</span></div>" +
                                      "</div>" +
                                      "<div class='popup-right'><table class='fac_geo_breakdown'>" +
                                      "<tr><td class='popup-field'>Inspections</td><td class='popup-stars'>" +
