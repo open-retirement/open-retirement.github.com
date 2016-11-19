@@ -6,13 +6,13 @@ var markerColorArr;
   // Get provider_id from URL parameter, query for it in API
   var provider_id = window.location.search.replace(/^\?/, "");
 
-  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=" +
+  var query_string = "https://data.medicare.gov/resource/b27b-2uc7.json?$where=" +
                      "federal_provider_number='" + provider_id + "'";
   $.ajax({
       url: query_string,
       dataType: "json",
       success: function(response) {
-        handleIdSearch(response);
+        handleIdSearch(response, provider_id);
       }
   });
 })()
@@ -87,8 +87,13 @@ function getGoogleSheetData(provider_id) {
   });
 }
 
+Handlebars.registerHelper("dateString", function(dateString) {
+  var dateParts = dateString.split(/[^0-9]/);
+  return dateParts[1] + "/" + dateParts[2] + "/" + dateParts[0];
+});
+
 // Handle response from Medicare API for provider id
-function handleIdSearch(response) {
+function handleIdSearch(response, provider_id) {
   provider = response[0];
 
   var scores = [
@@ -97,6 +102,8 @@ function handleIdSearch(response) {
     provider.staffing_rating,
     provider.rn_staffing_rating
   ];
+
+  scores = scores.map(function(d) { return parseInt(d); });
 
   // Assign description name based on overall rating
   provider.overall_description = overall_mapping[provider.overall_rating];
@@ -112,7 +119,18 @@ function handleIdSearch(response) {
     provider[categories[i]] = readScore(provider[categories[i]]);
   }
 
-  provider.phone = punctuatePhone(provider.provider_phone_number.phone_number);
+  provider.phone = punctuatePhone(provider.provider_phone_number);
+
+  // Add processing for checkbox values (default as no)
+  // First is continuing_care_retirement_community, special_focus_facility, provider_changed_ownership_in_last_12_months
+  var checkboxFields = ["continuing_care_retirement_community", "special_focus_facility",
+    "provider_changed_ownership_in_last_12_months"];
+
+  checkboxFields.forEach(function(c) {
+    provider[c] = provider[c] ? "Yes" : "No";
+  });
+
+  // provider.date_first_approved_to_provide_medicare_and_medicaid_services = parseDate(provider.date_first_approved_to_provide_medicare_and_medicaid_services);
 
   // Get template from script in page
   var template = $('#detail-template').html();
@@ -127,4 +145,41 @@ function handleIdSearch(response) {
   });
 
   getGoogleSheetData(provider.federal_provider_number);
+
+  // Call other data after initial template is loaded
+  var deficiency_string = "https://data.medicare.gov/resource/r5ix-sfxw.json?$where=" +
+                          "federal_provider_number='" + provider_id + "'";
+  $.ajax({
+      url: deficiency_string,
+      dataType: "json",
+      success: function(response) {
+        handleDeficiencies(response);
+      }
+  });
+
+  var owner_string = "https://data.medicare.gov/resource/y2hd-n93e.json?$where=" +
+                     "federal_provider_number='" + provider_id + "'";
+  $.ajax({
+      url: owner_string,
+      dataType: "json",
+      success: function(response) {
+        handleOwnerInfo(response);
+      }
+  });
+}
+
+function handleDeficiencies(response) {
+  var deficiencies = {deficiencies: response};
+  var template = $('#deficiencies-template').html();
+  var compiledTemplate = Handlebars.compile(template);
+  var result = compiledTemplate(deficiencies);
+  $('#deficiencies').html(result);
+}
+
+function handleOwnerInfo(response) {
+  var owners = {owners: response};
+  var template = $('#owner-template').html();
+  var compiledTemplate = Handlebars.compile(template);
+  var result = compiledTemplate(owners);
+  $('#owner-info').html(result);
 }

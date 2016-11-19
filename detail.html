@@ -71,13 +71,48 @@
             target="_blank">Medicare</a>.
           </p>
           <p>{{provider_address}}, {{provider_city}}</p>
-          <p>{{phone}}</p>
+          <p><a href="tel:{{phone}}">{{phone}}</a></p>
           <p>{{ownership_type}}</p>
         </div>
       </div>
-      <div class="row" id="bottom-div">
-        <div class="col-sm-12" id="additional">
+      <div class="row">
+        <div class="col-sm-6">
+          <table class="description">
+            <tbody>
+              <tr>
+                <td>Number of Certified Beds</td>
+                <td>{{number_of_certified_beds}}</td>
+              </tr>
+              <tr>
+                <td>Number of Residents in Certified Beds</td>
+                <td>{{number_of_residents_in_certified_beds}}</td>
+              </tr>
+              <tr>
+                <td>Date First Approved to Provide Services</td>
+                <td>{{dateString date_first_approved_to_provide_medicare_and_medicaid_services}}</td>
+              </tr>
+              <tr>
+                <td>Continuing Care Retirement Community?</td>
+                <td>{{continuing_care_retirement_community}}</td>
+              </tr>
+              <tr>
+                <td>Special Focus Facility?</td>
+                <td>{{special_focus_facility}}</td>
+              </tr>
+              <tr>
+                <td>Provider Changed Ownership in Last 12 Months?</td>
+                <td>{{provider_changed_ownership_in_last_12_months}}</td>
+              </tr>
+              <tr>
+                <td>Has Resident and Family Council?</td>
+                <td>{{with_a_resident_and_family_council}}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+        <div class="col-sm-6" id="additional"></div>
+      </div>
+      <div class="row">
         <div class="col-sm-12" id="body-details">
           <h3>Overall: {{{overall_rating}}}</h3>
           <p>The overall rating is generated through a process described <a href="https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/fsqrs.html"
@@ -114,6 +149,34 @@
           </p>
         </div>
       </div>
+      <div class="row" id="bottom-div">
+        <div class="col-sm-6 list-data" id="owner-info"></div>
+        <div class="col-sm-6 list-data" id="deficiencies"></div>
+      </div>
+    </script>
+    <script id="deficiencies-template" type="text/x-handlebars-template">
+      <h3>Deficiencies</h3>
+      {{#each deficiencies}}
+      <div>
+          <p>
+            <span>Surveyed</span>: {{dateString survey_date}},
+            <span>Corrected</span>: {{dateString correction_date}}
+          </p>
+          <p>{{deficiency_description}}</p>
+      </div>
+      {{/each}}
+    </script>
+    <script id="owner-template" type="text/x-handlebars-template">
+      <h3>Owner Information</h3>
+      {{#each owners}}
+      <div>
+          <p><span>Name</span>: {{owner_name}}</p>
+          <p><span>Type</span>: {{owner_type}}</p>
+          <p><span>Ownership %</span>: {{ownership_percentage}}</p>
+          <p><span>Association Date</span>: {{association_date}}</p>
+          <p><span>Role Description</span>: {{role_description}}</p>
+      </div>
+      {{/each}}
     </script>
   </body>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
