@@ -226,6 +226,31 @@ table.description tbody tr td:first-of-type {
   /*padding: 10px;*/
 }
 
+#loading_screen {
+  font-family: "Lato", Verdana, "Verdana Ref", sans-serif;
+  position: absolute;
+  color: #808080;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 24px;
+  text-align: center;
+  z-index: 200;
+  background: rgba(200,200,200,.6);
+}
+
+#loading_screen span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  height: 5%;
+  margin: auto;
+}
+
 @media (max-width:991px) and (min-width:768px) {
   /* Make sure Summary of detail page doesn't run into chart on medium size */
   .col-sm-6 ~ .col-sm-6 {

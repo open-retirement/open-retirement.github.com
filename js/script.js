@@ -317,6 +317,8 @@ function handleMedicareResponse(responses) {
 
   zip_matches.add(match_zips);
   provider_matches.add(match_providers);
+
+  hideLoadingMessage();
 }
 
 // Function for querying by address point and neighborhood
@@ -394,17 +396,6 @@ function screenReturnToTop() {
   }
 }
 
-function hasClass(ele,cls) {
-  return !!ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
-}
-
-function addClass(ele,cls) {
-  if (!hasClass(ele,cls)) ele.className += " "+cls;
-}
-
-function removeClass(ele,cls) {
-  if (hasClass(ele,cls)) {
-    var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
-    ele.className=ele.className.replace(reg,' ');
-  }
+function hideLoadingMessage() {
+  document.getElementById('loading_screen').style.display = 'none';
 }
