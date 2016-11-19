@@ -6,7 +6,7 @@ var markerColorArr;
   // Get provider_id from URL parameter, query for it in API
   var provider_id = window.location.search.replace(/^\?/, "");
 
-  var query_string = "https://data.medicare.gov/resource/4pq5-n9py.json?$where=" +
+  var query_string = "https://data.medicare.gov/resource/b27b-2uc7.json?$where=" +
                      "federal_provider_number='" + provider_id + "'";
   $.ajax({
       url: query_string,
@@ -103,6 +103,8 @@ function handleIdSearch(response, provider_id) {
     provider.rn_staffing_rating
   ];
 
+  scores = scores.map(function(d) { return parseInt(d); });
+
   // Assign description name based on overall rating
   provider.overall_description = overall_mapping[provider.overall_rating];
 
@@ -117,7 +119,7 @@ function handleIdSearch(response, provider_id) {
     provider[categories[i]] = readScore(provider[categories[i]]);
   }
 
-  provider.phone = punctuatePhone(provider.provider_phone_number.phone_number);
+  provider.phone = punctuatePhone(provider.provider_phone_number);
 
   // Add processing for checkbox values (default as no)
   // First is continuing_care_retirement_community, special_focus_facility, provider_changed_ownership_in_last_12_months

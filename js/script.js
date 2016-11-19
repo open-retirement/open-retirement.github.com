@@ -9,19 +9,6 @@ var auto_url = 'https://search.mapzen.com/v1/autocomplete';
 var search_url = 'https://search.mapzen.com/v1/search';
 L.mapbox.accessToken = 'pk.eyJ1IjoiY25ocyIsImEiOiJjaW11eXJiamwwMmprdjdra29kcW1xb2J2In0.ERYma-Q2MQtY6D02V-Fobg';
 
-// Set up bounding boxes for zip codes
-var chi_boxes = chi_zip.features.map(function(geo) {
-  var geo_box = {};
-  geo_box.gid = geo.properties.gid;
-  geo_box.category = "zip";
-  geo_box.label = geo.properties.zip;
-  geo_box.coordinates = geo.geometry.coordinates;
-  // Manually calculate center of box
-  geo_box.center = [(geo_box.coordinates[0][1][1] + geo_box.coordinates[0][3][1]) / 2,
-                    (geo_box.coordinates[0][1][0] + geo_box.coordinates[0][3][0]) / 2];
-  return geo_box;
-});
-
 var match_providers = [];
 
 var full_auto_url = auto_url + "?api_key=" + mapzen_key + "&focus.point.lon=-87.63&focus.point.lat=41.88&text=";
@@ -57,9 +44,9 @@ var addr_matches = new Bloodhound({
 });
 
 var zip_matches = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("label"),
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("zip"),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
-  local: chi_boxes
+  local: []
 });
 
 // Leave empty, data will be pulled from initial Socrata query
@@ -125,8 +112,9 @@ provider_matches.initialize();
 
   // Load initial data
   $.ajax({
-      url: "https://data.medicare.gov/resource/4pq5-n9py.json?$where=" +
-           "provider_state='IL'&provider_county_name='Cook'",
+      url: "https://data.medicare.gov/resource/b27b-2uc7.json?$where=" +
+           "provider_county_name in('Cook','Lake','Will','Du Page','Kane'," +
+           "'McHenry')&provider_state='IL'",
       dataType: "json",
       success: handleMedicareResponse
   });
@@ -139,7 +127,7 @@ provider_matches.initialize();
   },
   {
     name: 'zips',
-    display: 'label',
+    display: 'zip',
     source: zip_matches
   },
   {
@@ -159,12 +147,16 @@ provider_matches.initialize();
 
   $('#addr-search').bind('typeahead:select', function(ev, data) {
     if (data.category === "address") {
-      map.setView([data.geometry.coordinates[1], data.geometry.coordinates[0]], 14);
+      map.setView([data.geometry.coordinates[1],
+                   data.geometry.coordinates[0]], 14);
       locationQuery(data.geometry.coordinates);
     }
     else if (data.category === "zip") {
-      map.setView(data.center, 14);
-      locationQuery(data);
+      var providersWithZip = allProviders.filter(function(p) {
+        return p.properties.zip === data.zip;
+      });
+      medicareLayer.setGeoJSON(providersWithZip);
+      map.fitBounds(medicareLayer.getBounds());
     }
     else if (data.category === "provider") {
       medicareLayer.setGeoJSON([data]);
@@ -193,7 +185,7 @@ provider_matches.initialize();
     if (hasClass(clearTD, 'hidden')) {
       removeClass(clearTD, 'hidden');
     }
-  });  
+  });
 
   // listen for click on clear button
   clearButton.addEventListener("click", function(e) {
@@ -219,11 +211,12 @@ function searchQuery() {
   // Check if value is zip code, if so search against that
   if (inputElement.value.match('[0-9]{5}')) {
     zip_val = inputElement.value;
-    for (var i = 0; i < chi_boxes.length; ++i) {
-      if (chi_boxes[i].label === zip_val) {
-        map.setView(chi_boxes[i].center, 14);
-        locationQuery(chi_boxes[i]);
-      }
+    var providersWithZip = allProviders.filter(function(p) {
+      return p.properties.zip === zip_val;
+    });
+    if (providersWithZip.length) {
+      medicareLayer.setGeoJSON(providersWithZip);
+      map.fitBounds(medicareLayer.getBounds());
     }
   }
   else {
@@ -245,6 +238,7 @@ function handleMedicareResponse(responses) {
     };
 
     fac_geo.properties.street_addr = facility.provider_address;
+    fac_geo.properties.zip = facility.provider_zip_code;
     fac_geo.properties.federal_provider_number = facility.federal_provider_number;
     fac_geo.properties.city = facility.provider_city;
     fac_geo.properties.ownership_type = facility.ownership_type;
@@ -260,7 +254,7 @@ function handleMedicareResponse(responses) {
     }
 
     // Getting phone number and formatting it for tooltip
-    var provider_phone = facility.provider_phone_number.phone_number;
+    var provider_phone = facility.provider_phone_number;
     //var provider_phone = facility.provider_phone_number.toString();
     var phone = "(" + provider_phone.substr(0,3) + ") " + provider_phone.substr(3,3) +
                 "-" + provider_phone.substr(6,4);
@@ -289,9 +283,9 @@ function handleMedicareResponse(responses) {
                                      "</table></div><p style='clear:both;'></p>";
 
 
-    if (!isNaN(parseFloat(facility.location.longitude))) {
-      fac_geo.geometry.coordinates = [parseFloat(facility.location.longitude),
-                                      parseFloat(facility.location.latitude)];
+    if (facility.location) {
+      fac_geo.geometry.coordinates = [parseFloat(facility.location.coordinates[0]),
+                                      parseFloat(facility.location.coordinates[1])];
       allProviders.push(fac_geo);
     }
 
@@ -313,6 +307,13 @@ function handleMedicareResponse(responses) {
     return p;
   });
 
+  // Get zips in array to establish unique, then make into object for search
+  match_zips = allProviders.map(function(p) {
+    return p.properties.zip;
+  }).filter(function(item, i, ar) { return ar.indexOf(item) === i;
+  }).map(function(z) { return {zip: z, category: "zip"}; });
+
+  zip_matches.add(match_zips);
   provider_matches.add(match_providers);
 }
 
@@ -373,7 +374,8 @@ function callMapzen() {
     dataType: "json",
     success: function(data) {
       if (data && data.features) {
-          map.setView([data.features[0].geometry.coordinates[1], data.features[0].geometry.coordinates[0]], 14);
+          map.setView([data.features[0].geometry.coordinates[1],
+                       data.features[0].geometry.coordinates[0]], 14);
           locationQuery(data.features[0].geometry.coordinates);
         }
     },
