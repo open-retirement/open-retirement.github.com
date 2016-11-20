@@ -271,7 +271,9 @@ function handleMedicareResponse(responses) {
                                      "<li>" + fac_geo.properties.ownership_type +
                                      "</li></ul></div>" +
                                      "<div class='popup-left'>" +
-                                     "<div class='fac_geo_overall'>Rating: <span class='rating_number'>" + fac_geo.properties.scores[0] + "</span></div>" +
+                                     "<div class='fac_geo_overall'>Rating: <span class='rating_number rating-" +
+                                     fac_geo.properties.scores[0] +
+                                     "'>" + fac_geo.properties.scores[0] + "</span></div>" +
                                      "</div>" +
                                      "<div class='popup-right'><table class='fac_geo_breakdown'>" +
                                      "<tr><td class='popup-field'>Inspections</td><td class='popup-stars'>" +
@@ -315,6 +317,8 @@ function handleMedicareResponse(responses) {
 
   zip_matches.add(match_zips);
   provider_matches.add(match_providers);
+
+  hideLoadingMessage();
 }
 
 // Function for querying by address point and neighborhood
@@ -392,17 +396,6 @@ function screenReturnToTop() {
   }
 }
 
-function hasClass(ele,cls) {
-  return !!ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
-}
-
-function addClass(ele,cls) {
-  if (!hasClass(ele,cls)) ele.className += " "+cls;
-}
-
-function removeClass(ele,cls) {
-  if (hasClass(ele,cls)) {
-    var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
-    ele.className=ele.className.replace(reg,' ');
-  }
+function hideLoadingMessage() {
+  document.getElementById('loading_screen').style.display = 'none';
 }

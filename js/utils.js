@@ -20,3 +20,18 @@ var readScore = function(score) {
 var punctuatePhone = function(phone_string) {
 	return "(" + phone_string.substr(0,3) + ") " + phone_string.substr(3,3) + "-" + phone_string.substr(6,4);
 };
+
+function hasClass(ele,cls) {
+  return !!ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
+}
+
+function addClass(ele,cls) {
+  if (!hasClass(ele,cls)) ele.className += " "+cls;
+}
+
+function removeClass(ele,cls) {
+  if (hasClass(ele,cls)) {
+    var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
+    ele.className=ele.className.replace(reg,' ');
+  }
+};
