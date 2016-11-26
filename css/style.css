@@ -53,6 +53,10 @@ select {
   -mozilla-padding-start: 1em;
 }
 
+.popup-window {
+  width: 330px;
+}
+
 .leaflet-popup-content .popup-left {
   float: left;
 }
@@ -86,7 +90,6 @@ div.marker-title {
   display: inline-block;
   font-size: 24px;
   font-weight: 700;
-  margin-left: 5px;
   padding: 10px;
   width: 44px;
   height: 44px;
@@ -261,5 +264,21 @@ table.description tbody tr td:first-of-type {
 @media (max-width:767px) {
   .img-responsive {
     margin-bottom: 0;
+  }
+}
+
+@media (max-width:400px) {
+  div.marker-title {
+    padding-left: 25px;
+  }
+  .leaflet-popup-content .popup-left {
+    margin-bottom: 10px;
+  }
+  .leaflet-popup-content .popup-right,
+  .leaflet-popup-content .popup-left {
+    float: none;
+  }
+  .popup-window {
+    width: 280px;
   }
 }

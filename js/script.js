@@ -97,7 +97,7 @@ provider_matches.initialize();
       // http://leafletjs.com/reference.html#popup
       marker.bindPopup(popupContent,{
           closeButton: true,
-          minWidth: 330,
+          className: "popup-window",
           keepInView: true
       });
   });
