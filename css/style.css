@@ -254,6 +254,26 @@ table.description tbody tr td:first-of-type {
   margin: auto;
 }
 
+/*
+Lifted from
+https://www.smashingmagazine.com/2014/02/making-embedded-content-work-in-responsive-design/
+*/
+.form-container {
+  position: relative;
+  padding-bottom: 100%;
+  padding-top: 100%;
+  height: 0;
+  overflow: hidden;
+}
+
+.form-container iframe {
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
 @media (max-width:991px) and (min-width:768px) {
   /* Make sure Summary of detail page doesn't run into chart on medium size */
   .col-sm-6 ~ .col-sm-6 {
