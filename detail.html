@@ -1,187 +1,140 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Chicago Nursing Home Search</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta charset='utf-8' />
-    <meta content="A tool to help people in the Chicagoland area choose the best nursing home they can afford." name='description' />
-    <meta content='Chicago Nursing Home Search' name='author' />
-    <!-- Facebook metadata -->
-    <meta content="Chicago Nursing Home Search" property="og:site_name">
-    <meta content="Chicago Nursing Home Search" property="og:title">
-    <meta content="website" property="og:type">
-    <meta content="A tool to help people in the Chicagoland area choose the best nursing home they can afford." property="og:description">
-    <meta content="http://chicagonursinghomesearch.com/" property="og:url">
-    <meta content="http://chicagonursinghomesearch.com/img/logo.png" property="og:image">
-    <!-- Twitter metadata -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="Chicago Nursing Home Search">
-    <meta name="twitter:creator" content="Chicago Nursing Home Search">
-    <meta name="twitter:title" content="Chicago Nursing Home Search">
-    <meta name="twitter:url" content="http://chicagonursinghomesearch.com/">
-    <meta name="twitter:description" content="A tool to help people in the Chicagoland area choose the best nursing home they can afford.">
-    <meta name="twitter:image:src" content="http://chicagonursinghomesearch.com/img/logo.png">
-
-    <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="build/build.min.css" />
-    <link rel="stylesheet" href="css/style.css" />
-    <!-- Google Tag Manager -->
-    <noscript>
-      <iframe src="//www.googletagmanager.com/ns.html?id=GTM-TQPSF2"
-      height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TQPSF2');
-    </script>
-    <!-- End Google Tag Manager -->
-  </head>
-  <body>
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <ul class="nav navbar-nav">
-          <li><a href="/">Home</a></li>
-          <li><a href="/about.html">About</a></li>
-          <li><a href="/news.html">News</a></li>
-          <li><a href="/contact.html">Contact</a></li>
-        </ul>
-      </div>
-    </nav>
-    <div class="container detail" id="main">
+---
+layout: default
+permalink: /detail
+js_files:
+  - /build/bower.min.js
+  - /js/utils.js
+  - /js/detail.js
+---
+{% raw %}
+<div class="container detail" id="main">
+</div>
+<script id="detail-template" type="text/x-handlebars-template">
+  <div class="row title">
+    <div class="col-sm-12">
+      <h2>{{provider_name}}</h2>
+      <button class="print-button" onclick="window.print(); return false"><i class="fa fa-print"></i></button>
     </div>
-    <script id="detail-template" type="text/x-handlebars-template">
-      <div class="row title">
-        <div class="col-sm-12">
-          <h2>{{provider_name}}</h2>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-sm-6">
-          <h3>Medicare Ratings</h3>
-          <div id="detail_chart"></div>
-        </div>
-        <div class="col-sm-6">
-          <h3>Summary</h3>
-          <p>{{provider_name}} in {{provider_city}}, {{provider_state}} has an Overall
-            Rating of <b>{{overall_description}}</b>. See below for the measures
-            that make up that rating. Descriptions from <a href="https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/fsqrs.html"
-            target="_blank">Medicare</a>.
-          </p>
-          <p>{{provider_address}}, {{provider_city}}</p>
-          <p><a href="tel:{{phone}}">{{phone}}</a></p>
-          <p>{{ownership_type}}</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-sm-6">
-          <table class="description">
-            <tbody>
-              <tr>
-                <td>Number of Certified Beds</td>
-                <td>{{number_of_certified_beds}}</td>
-              </tr>
-              <tr>
-                <td>Number of Residents in Certified Beds</td>
-                <td>{{number_of_residents_in_certified_beds}}</td>
-              </tr>
-              <tr>
-                <td>Date First Approved to Provide Services</td>
-                <td>{{dateString date_first_approved_to_provide_medicare_and_medicaid_services}}</td>
-              </tr>
-              <tr>
-                <td>Continuing Care Retirement Community?</td>
-                <td>{{continuing_care_retirement_community}}</td>
-              </tr>
-              <tr>
-                <td>Special Focus Facility?</td>
-                <td>{{special_focus_facility}}</td>
-              </tr>
-              <tr>
-                <td>Provider Changed Ownership in Last 12 Months?</td>
-                <td>{{provider_changed_ownership_in_last_12_months}}</td>
-              </tr>
-              <tr>
-                <td>Has Resident and Family Council?</td>
-                <td>{{with_a_resident_and_family_council}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-6" id="additional"></div>
-      </div>
-      <div class="row">
-        <div class="col-sm-12" id="body-details">
-          <h3>Overall: {{{overall_rating}}}</h3>
-          <p>The overall rating is generated through a process described <a href="https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/fsqrs.html"
-            target="_blank">by Medicare</a>. They start from the health inspection
-            rating, and then generate the score by weighing in other factors as well.
-            It is worth noting that we have chosen not to include the Quality Measure
-            (QM) rating as it is entirely self-reported, but the QM rating is part
-            of the process for creating the overall rating.
-          </p>
-          <h3>Inspections: {{{health_inspection_rating}}}</h3>
-          <p>The health inspection rating contains information from the last 3 years
-            of onsite inspections, including both standard surveys and any complaint
-            surveys. This information is gathered by trained, objective inspectors
-            who go onsite to the nursing home and follow a specific process to
-            determine the extent to which a nursing home has met Medicaid and
-            Medicare's minimum quality requirements.  The most recent survey findings
-            are weighted more than the prior two years.  More than 180,000 onsite
-            reviews are used in the health inspection scoring nationally.
-          </p>
-          <h3>Staffing: {{{staffing_rating}}}</h3>
-          <p>The staffing rating has information about the number of hours of care
-            provided on average to each resident each day by nursing staff. This
-            rating considers differences in the levels of residents' care need in
-            each nursing home. For example, a nursing home with residents who had
-            more severe needs would be expected to have more nursing staff than a
-            nursing home where the resident needs were not as high. All information
-            on staffing is submitted by the facility.
-          </p>
-          <h3>Nurses: {{{rn_staffing_rating}}}</h3>
-          <p>The nurses rating is similar to the staffing rating, but specifically
-            to data relating to Registered Nurses (RNs). Like the general staffing
-            rating, RN staffing information is submitted by the facility and adjusted
-            for the needs of the nursing home residents.
-          </p>
-        </div>
-      </div>
-      <div class="row" id="bottom-div">
-        <div class="col-sm-6 list-data" id="owner-info"></div>
-        <div class="col-sm-6 list-data" id="deficiencies"></div>
-      </div>
-    </script>
-    <script id="deficiencies-template" type="text/x-handlebars-template">
-      <h3>Deficiencies</h3>
-      {{#each deficiencies}}
-      <div>
-          <p>
-            <span>Surveyed</span>: {{dateString survey_date}},
-            <span>Corrected</span>: {{dateString correction_date}}
-          </p>
-          <p>{{deficiency_description}}</p>
-      </div>
-      {{/each}}
-    </script>
-    <script id="owner-template" type="text/x-handlebars-template">
-      <h3>Owner Information</h3>
-      {{#each owners}}
-      <div>
-          <p><span>Name</span>: {{owner_name}}</p>
-          <p><span>Type</span>: {{owner_type}}</p>
-          <p><span>Ownership %</span>: {{ownership_percentage}}</p>
-          <p><span>Association Date</span>: {{association_date}}</p>
-          <p><span>Role Description</span>: {{role_description}}</p>
-      </div>
-      {{/each}}
-    </script>
-  </body>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript" src="build/bower.min.js"></script>
-  <script type="text/javascript" src="js/utils.js"></script>
-  <script type="text/javascript" src="js/detail.js"></script>
-</html>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <h3>Medicare Ratings</h3>
+      <div id="detail_chart"></div>
+    </div>
+    <div class="col-sm-6">
+      <h3>Summary</h3>
+      <p>{{provider_name}} in {{provider_city}}, {{provider_state}} has an Overall
+        Rating of <b>{{overall_description}}</b>. See below for the measures
+        that make up that rating. Descriptions from <a href="https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/fsqrs.html"
+        target="_blank">Medicare</a>.
+      </p>
+      <p>{{provider_address}}, {{provider_city}}</p>
+      <p><a href="tel:{{phone}}">{{phone}}</a></p>
+      <p>{{ownership_type}}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <table class="description">
+        <tbody>
+          <tr>
+            <td>Number of Certified Beds</td>
+            <td>{{number_of_certified_beds}}</td>
+          </tr>
+          <tr>
+            <td>Number of Residents in Certified Beds</td>
+            <td>{{number_of_residents_in_certified_beds}}</td>
+          </tr>
+          <tr>
+            <td>Date First Approved to Provide Services</td>
+            <td>{{dateString date_first_approved_to_provide_medicare_and_medicaid_services}}</td>
+          </tr>
+          <tr>
+            <td>Continuing Care Retirement Community?</td>
+            <td>{{continuing_care_retirement_community}}</td>
+          </tr>
+          <tr>
+            <td>Special Focus Facility?</td>
+            <td>{{special_focus_facility}}</td>
+          </tr>
+          <tr>
+            <td>Provider Changed Ownership in Last 12 Months?</td>
+            <td>{{provider_changed_ownership_in_last_12_months}}</td>
+          </tr>
+          <tr>
+            <td>Has Resident and Family Council?</td>
+            <td>{{with_a_resident_and_family_council}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-6" id="additional"></div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12" id="body-details">
+      <h3>Overall: {{{overall_rating}}}</h3>
+      <p>The overall rating is generated through a process described <a href="https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/fsqrs.html"
+        target="_blank">by Medicare</a>. They start from the health inspection
+        rating, and then generate the score by weighing in other factors as well.
+        It is worth noting that we have chosen not to include the Quality Measure
+        (QM) rating as it is entirely self-reported, but the QM rating is part
+        of the process for creating the overall rating.
+      </p>
+      <h3>Inspections: {{{health_inspection_rating}}}</h3>
+      <p>The health inspection rating contains information from the last 3 years
+        of onsite inspections, including both standard surveys and any complaint
+        surveys. This information is gathered by trained, objective inspectors
+        who go onsite to the nursing home and follow a specific process to
+        determine the extent to which a nursing home has met Medicaid and
+        Medicare's minimum quality requirements.  The most recent survey findings
+        are weighted more than the prior two years.  More than 180,000 onsite
+        reviews are used in the health inspection scoring nationally.
+      </p>
+      <h3>Staffing: {{{staffing_rating}}}</h3>
+      <p>The staffing rating has information about the number of hours of care
+        provided on average to each resident each day by nursing staff. This
+        rating considers differences in the levels of residents' care need in
+        each nursing home. For example, a nursing home with residents who had
+        more severe needs would be expected to have more nursing staff than a
+        nursing home where the resident needs were not as high. All information
+        on staffing is submitted by the facility.
+      </p>
+      <h3>Nurses: {{{rn_staffing_rating}}}</h3>
+      <p>The nurses rating is similar to the staffing rating, but specifically
+        to data relating to Registered Nurses (RNs). Like the general staffing
+        rating, RN staffing information is submitted by the facility and adjusted
+        for the needs of the nursing home residents.
+      </p>
+    </div>
+  </div>
+  <div class="row" id="bottom-div">
+    <div class="col-sm-6 list-data" id="owner-info"></div>
+    <div class="col-sm-6 list-data" id="deficiencies"></div>
+  </div>
+</script>
+<script id="deficiencies-template" type="text/x-handlebars-template">
+  <h3>Deficiencies</h3>
+  {{#each deficiencies}}
+  <div>
+      <p>
+        <span>Surveyed</span>: {{dateString survey_date}},
+        <span>Corrected</span>: {{dateString correction_date}}
+      </p>
+      <p>{{deficiency_description}}</p>
+  </div>
+  {{/each}}
+</script>
+<script id="owner-template" type="text/x-handlebars-template">
+  <h3>Owner Information</h3>
+  {{#each owners}}
+  <div>
+      <p><span>Name</span>: {{owner_name}}</p>
+      <p><span>Type</span>: {{owner_type}}</p>
+      <p><span>Ownership %</span>: {{ownership_percentage}}</p>
+      <p><span>Association Date</span>: {{association_date}}</p>
+      <p><span>Role Description</span>: {{role_description}}</p>
+  </div>
+  {{/each}}
+</script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endraw %}

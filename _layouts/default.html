@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  {% include head.html %}
+  <body>
+    {% include header.html %}
+    {{ content }}
+    {% include footer.html %}
+  </body>
+  {% if page.js_files %}
+    {% for js in page.js_files %}
+    <script type="text/javascript" src="{{ js | prepend: site.baseurl }}"></script>
+    {% endfor %}
+  {% endif %}
+</html>

@@ -8,20 +8,24 @@ h2 {
   text-align: center;
 }
 
+a {
+  font-weight: bold;
+}
+
 .navbar-collapse.collapse {
-display: block!important;
+  display: block!important;
 }
 
 .navbar-nav>li, .navbar-nav {
-float: left !important;
+  float: left !important;
 }
 
 .navbar-nav.navbar-right:last-child {
-margin-right: -15px !important;
+  margin-right: -15px !important;
 }
 
 .navbar-right {
-float: right!important;
+  float: right!important;
 }
 
 .row {
@@ -99,23 +103,28 @@ div.marker-title {
   color: #ffffff;
 }
 
+.rating-1,
 .fac_geo_overall .rating_number.rating-1 {
   background: #d7191c;
 }
 
+.rating-2,
 .fac_geo_overall .rating_number.rating-2 {
   background: #fdae61;
 }
 
+.rating-3,
 .fac_geo_overall .rating_number.rating-3 {
-  background: #ffffbf;
+  background: #f7f76a;
   color: #404033;
 }
 
+.rating-4,
 .fac_geo_overall .rating_number.rating-4 {
   background: #a6d96a;
 }
 
+.rating-5,
 .fac_geo_overall .rating_number.rating-5 {
   background: #1a9641;
 }
@@ -145,13 +154,18 @@ input.typeahead {
   width: 100%;
 }
 
-.searchAndClear {
+.searchAndClear,
+.print-button {
   height: 34px;
   width: 34px;
   border-radius: 4px;
   border-width: 1px;
   background-color: #f9f9f9;
   padding: 0;
+}
+
+.print-button {
+  float:right;
 }
 
 .tt-menu {
@@ -252,6 +266,34 @@ table.description tbody tr td:first-of-type {
   width: 50%;
   height: 5%;
   margin: auto;
+}
+
+.social-share a {
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  background-color
+  margin: 10px;
+  border-radius: 20%;
+  color: #fff;
+  font-size: 24px;
+  opacity: 0.75;
+  text-align: center;
+}
+.social-share a:hover {
+  opacity: 1.0;
+}
+.social-share a i {
+	position: relative;
+	top: 20%;
+	transform: translateY(-20%);
+  margin: 0 auto;
+}
+.facebook {
+ 	background: #3b5998;
+}
+.twitter {
+	background: #55acee;
 }
 
 @media (max-width:991px) and (min-width:768px) {

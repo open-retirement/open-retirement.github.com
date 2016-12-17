@@ -1,0 +1,10 @@
+port: 5000
+encoding: utf-8
+title: Chicago Nursing Home Search
+description: >
+  A tool to highlight disparities in nursing home quality in Chicagoland.
+baseurl: ""
+url: "http://chicagonursinghomesearch.com"
+
+# Build settings
+markdown: kramdown

@@ -1,106 +1,55 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Chicago Nursing Home Search</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta charset='utf-8' />
-    <meta content="A tool to highlight disparities in nursing home quality in Chicagoland." name='description' />
-    <meta content='Chicago Nursing Home Search' name='author' />
-    <!-- Facebook metadata -->
-    <meta content="Chicago Nursing Home Search" property="og:site_name">
-    <meta content="Chicago Nursing Home Search" property="og:title">
-    <meta content="website" property="og:type">
-    <meta content="A tool to highlight disparities in nursing home quality  in Chicagoland" property="og:description">
-    <meta content="http://chicagonursinghomesearch.com/" property="og:url">
-    <meta content="http://chicagonursinghomesearch.com/img/logo.png" property="og:image">
-    <!-- Twitter metadata -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="Chicago Nursing Home Search">
-    <meta name="twitter:creator" content="Chicago Nursing Home Search">
-    <meta name="twitter:title" content="Chicago Nursing Home Search">
-    <meta name="twitter:url" content="http://chicagonursinghomesearch.com/">
-    <meta name="twitter:description" content="A tool to highlight disparities in nursing home quality  in Chicagoland">
-    <meta name="twitter:image:src" content="http://chicagonursinghomesearch.com/img/logo.png">
-
-    <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="build/build.min.css" />
-    <link rel="stylesheet" href="css/style.css" />
-    <!-- Google Tag Manager -->
-    <noscript>
-      <iframe src="//www.googletagmanager.com/ns.html?id=GTM-TQPSF2"
-      height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TQPSF2');
-    </script>
-    <!-- End Google Tag Manager -->
-    <!-- Font Awesome -->
-    <script src="https://use.fontawesome.com/d70ddbbdd8.js"></script>
-  </head>
-  <body>
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <ul class="nav navbar-nav">
-          <li><a href="/">Home</a></li>
-          <li><a href="/about.html">About</a></li>
-          <li><a href="/news.html">News</a></li>
-          <li><a href="/contact.html">Contact</a></li>
-        </ul>
-      </div>
-    </nav>
-    <div class="container" id="main">
-      <div class="row map">
-        <div class="col-sm-4" id="bottom-div">
-          <img id="logo" class="img-responsive" src="img/logo.png">
-          <table class="search-container">
-            <tbody>
-              <tr>
-                <td>
-                  <input class="typeahead form-control" id="addr-search" type="text" placeholder="Enter address, zip, or provider name">
-                </td>
-                <td>
-                  <!--<button id="search"><img src="img/search_icon.svg"></button>-->
-                  <!-- Switching to font awesome -->
-                  <button id="search" class="searchAndClear"><i class="fa fa-search" aria-hidden="true"></i></button>
-                </td>
-                <td id="clearTD" class="hidden">
-                  <button id="clearButton" class="searchAndClear"><i class="fa fa-times" aria-hidden="true"></i></button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <p>This is a map of all the nursing homes in Chicagoland. The colors show <a href="https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py" target="_blank">Medicare</a>'s 1-5 star rating for each home. Red pins are the lowest and green pins are the highest.</p>
-          <p>Click on a pin to see details on that home. Click on the home's name for more details.</p>
-        </div>
-        <div class="col-sm-8 map">
-          <div id='legend' style='display:none;'>
-            <strong>Nursing Homes by Overall Score</strong>
-            <nav class='legend clearfix'>
-              <span style='background:#d7191c;'></span>
-              <span style='background:#fdae61;'></span>
-              <span style='background:#ffffbf;'></span>
-              <span style='background:#a6d96a;'></span>
-              <span style='background:#1a9641;'></span>
-              <label>1</label>
-              <label>2</label>
-              <label>3</label>
-              <label>4</label>
-              <label>5</label>
-              <small>Source: <a href="https://data.medicare.gov/" target="_blank">Medicare Open Data</a></small>
-          </div>
-          <div id="map">
-            <div id="loading_screen"><span>Loading map and nursing homes...</span></div>
-          </div>
-        </div>
+---
+layout: default
+js_files:
+  - /build/bower.min.js
+  - /js/utils.js
+  - /js/script.js
+---
+<div class="container" id="main">
+  <div class="row map">
+    <div class="col-sm-4" id="bottom-div">
+      <img id="logo" class="img-responsive" src="img/logo.png">
+      <table class="search-container">
+        <tbody>
+          <tr>
+            <td>
+              <input class="typeahead form-control" id="addr-search" type="text" placeholder="Enter address, zip, or provider name">
+            </td>
+            <td>
+              <button id="search" class="searchAndClear"><i class="fa fa-search" aria-hidden="true"></i></button>
+            </td>
+            <td id="clearTD" class="hidden">
+              <button id="clearButton" class="searchAndClear"><i class="fa fa-times" aria-hidden="true"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>This is a map of all the nursing homes in Chicagoland. The colors show <a href="https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py" target="_blank">Medicare</a>'s 1-5 star rating for each home. Red pins are the lowest and green pins are the highest.</p>
+      <p>Click on a pin to see details on that home. Click on the home's name for more details.</p>
+      <div class="social-share">
+        <a class="facebook" href="http://www.facebook.com/share.php?u={{site.url}}" target="blank"><i class="fa fa-facebook"></i></a>
+        <a class="twitter" href="http://twitter.com/intent/tweet?status={{site.title}}+{{site.url}}" target="blank"><i class="fa fa-twitter"></i></a>
       </div>
     </div>
-  </body>
-  <script type="text/javascript" src="build/bower.min.js"></script>
-  <script type="text/javascript" src="js/utils.js"></script>
-  <script type="text/javascript" src="js/script.js"></script>
-</html>
+    <div class="col-sm-8 map">
+      <div id='legend' style='display:none;'>
+        <strong>Nursing Homes by Overall Score</strong>
+        <nav class='legend clearfix'>
+          <span class="rating-1"></span>
+          <span class="rating-2"></span>
+          <span class="rating-3"></span>
+          <span class="rating-4"></span>
+          <span class="rating-5"></span>
+          <label>1</label>
+          <label>2</label>
+          <label>3</label>
+          <label>4</label>
+          <label>5</label>
+          <small>Source: <a href="https://data.medicare.gov/" target="_blank">Medicare Open Data</a></small>
+      </div>
+      <div id="map">
+        <div id="loading_screen"><span>Loading map and nursing homes...</span></div>
+      </div>
+    </div>
+  </div>
+</div>
