@@ -89,7 +89,7 @@ provider_matches.initialize();
       var feature = marker.feature;
 
       // Create custom popup content
-      var popupContent =  "<div class='marker-title'><a href='/detail.html?" +
+      var popupContent =  "<div class='marker-title'><a href='/detail?" +
                           feature.properties.federal_provider_number + "'>" +
                           feature.properties.title + "</a></div>" +
                           feature.properties.description;

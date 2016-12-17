@@ -7,17 +7,14 @@ See the live site here: [Chicago Nursing Home Search](http://chicagonursinghomes
 
 ## Running Locally
 
-If you want to run the site on your computer, you can clone it through git with:
-
+To run this site locally, you'll need to use [Jekyll](https://github.com/jekyll/jekyll).
+Then, to clone the site with git and run it with:
 ``` bash
 git clone https://github.com/open-retirement/open-retirement.github.com.git
 cd open-retirement.github.com
-
-# to run locally
-python -m SimpleHTTPServer
+jekyll serve
 ```
-
-Then navigate to http://localhost:8000/ in a browser.
+You'll be able to see it running at `http://localhost:5000`
 
 ## Contributing
 

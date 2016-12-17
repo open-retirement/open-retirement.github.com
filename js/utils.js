@@ -2,7 +2,7 @@
 var overall_mapping = [ "Unavailable", "Poor", "Below Average", "Average",
                         "Above Average", "Excellent" ];
 
-var markerColorArr = ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"];
+var markerColorArr = ["#d7191c", "#fdae61", "#f7f76a", "#a6d96a", "#1a9641"];
 
 var readScore = function(score) {
   if (score === undefined || score === null) {
