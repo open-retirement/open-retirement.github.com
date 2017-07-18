@@ -112,7 +112,8 @@ provider_matches.initialize();
 
   // Load initial data
   $.ajax({
-      url: "https://data.medicare.gov/resource/b27b-2uc7.json?$where=" +
+      url: "https://data.medicare.gov/resource/b27b-2uc7.json?" +
+           "$select=:*, *&$where=" +
            "provider_county_name in('Cook','Lake','Will','Du Page','Kane'," +
            "'McHenry')&provider_state='IL'",
       dataType: "json",
@@ -317,6 +318,8 @@ function handleMedicareResponse(responses) {
 
   zip_matches.add(match_zips);
   provider_matches.add(match_providers);
+
+  document.getElementById("lastUpdated").innerHTML = responses[0][":updated_at"].substr(0, 10);
 
   hideLoadingMessage();
 }
