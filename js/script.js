@@ -4,14 +4,12 @@ var allProviders = [];
 
 // Mapzen search functionality and details
 var inputElement = document.getElementById("addr-search");
-var mapzen_key = "search-Cq8H0_o";
-var auto_url = 'https://search.mapzen.com/v1/autocomplete';
-var search_url = 'https://search.mapzen.com/v1/search';
+var search_url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
 L.mapbox.accessToken = 'pk.eyJ1IjoiY25ocyIsImEiOiJjaW11eXJiamwwMmprdjdra29kcW1xb2J2In0.ERYma-Q2MQtY6D02V-Fobg';
 
 var match_providers = [];
 
-var full_auto_url = auto_url + "?api_key=" + mapzen_key + "&focus.point.lon=-87.63&focus.point.lat=41.88&text=";
+var full_auto_url_post = '.json?access_token=' + L.mapbox.accessToken + '&proximity=-87.63,41.88';
 
 var readScore;
 var overall_mapping;
@@ -23,22 +21,21 @@ var addr_matches = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace("label"),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
   remote: {
-      url: full_auto_url,
+      url: search_url,
       rateLimitBy: "throttle",
       rateLimitWait: 1000,
       replace: function() {
         var val = inputElement.value;
-        var processed_url = full_auto_url + encodeURIComponent(val);
-        return processed_url;
+        return search_url + encodeURIComponent(val) + full_auto_url_post + '&autocomplete=true';
       },
       transform: function(response) {
-        response.features.map(function(addr) {
-            addr.label = addr.properties.label;
-            addr.category = "address";
-            return addr;
-          });
-        //return chi_boxes.concat(match_providers, response.features);
-        return response.features;
+        return response.features.map(function(addr) {
+          return {
+            label: addr.place_name,
+            geometry: addr.geometry,
+            category: 'address'
+          };
+        });
       }
     }
 });
@@ -139,7 +136,8 @@ provider_matches.initialize();
   {
     name: 'addresses',
     display: 'label',
-    source: addr_matches
+    source: addr_matches,
+    limit: 4
   }
   );
 
@@ -221,7 +219,7 @@ function searchQuery() {
     }
   }
   else {
-    callMapzen();
+    callGeocoder();
   }
   screenReturnToTop();
 }
@@ -369,15 +367,10 @@ function locationQuery(queryObj) {
 }
 
 // Call Mapzen API, handle responses
-function callMapzen() {
+function callGeocoder() {
   $.ajax({
-    url: search_url,
-    data: {
-      api_key: mapzen_key,
-      "focus.point.lon": -87.63,
-      "focus.point.lat": 41.88,
-      text: inputElement.value
-    },
+    url: search_url + encodeURIComponent(inputElement.value) + full_auto_url_post,
+    data: { access_token: L.mapbox.accessToken },
     dataType: "json",
     success: function(data) {
       if (data && data.features) {
