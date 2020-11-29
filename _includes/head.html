@@ -25,9 +25,14 @@
   <meta name="twitter:image:src" content="{{ "/img/logo.png" | prepend: site.baseurl | prepend: site.url }}">
 
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
   <link rel="stylesheet" href="{{ "/build/build.min.css" | prepend: site.baseurl }}" />
   <link rel="stylesheet" href="{{ "/css/style.css" | prepend: site.baseurl }}" />
   <link rel="stylesheet" href="{{ "/css/print.css" | prepend: site.baseurl }}" media="print">
+
+  <script src="https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
+
   <!-- Google Tag Manager -->
   <noscript>
     <iframe src="//www.googletagmanager.com/ns.html?id=GTM-TQPSF2"

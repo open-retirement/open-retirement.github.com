@@ -33,7 +33,7 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['build/grunt.min.js', 'build/turf.min.js'],
+        src: ['build/grunt.min.js'],
         dest: 'build/bower.min.js',
       },
     },

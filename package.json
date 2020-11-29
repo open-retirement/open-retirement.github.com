@@ -13,7 +13,7 @@
   "description": "Chicago Nursing Home Search",
   "dependencies": {},
   "scripts": {
-    "postinstall": "./node_modules/bower/bin/bower install && ./node_modules/grunt-cli/bin/grunt && cp -r bower_components/mapbox.js/images build"
+    "postinstall": "./node_modules/bower/bin/bower install && ./node_modules/grunt-cli/bin/grunt"
   },
   "author": [
     "Patrick Sier"

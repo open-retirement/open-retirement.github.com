@@ -5,7 +5,7 @@ var allProviders = [];
 // Mapzen search functionality and details
 var inputElement = document.getElementById("addr-search");
 var search_url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
-L.mapbox.accessToken = 'pk.eyJ1IjoiY25ocyIsImEiOiJjaW11eXJiamwwMmprdjdra29kcW1xb2J2In0.ERYma-Q2MQtY6D02V-Fobg';
+L.mapbox.accessToken = 'pk.eyJ1IjoicGpzaWVyIiwiYSI6ImNraTNudGh5MzF5azYyeW5tb2hwc2ZqMWwifQ.sJ_xrlXxSi00F5Un7WHvjg';
 
 var match_providers = [];
 
@@ -59,12 +59,8 @@ provider_matches.initialize();
 
 // Execute on page load
 (function(){
-  map = L.mapbox.map('map', 'mapbox.light', {
-      legendControl: {
-        position: "bottomleft"
-      },
-      minZoom: 7
-  }).setView([41.907477, -87.685913], 10);
+  map = L.mapbox.map('map').setView([41.907477, -87.685913], 10)
+    .addLayer(L.mapbox.styleLayer('mapbox://styles/mapbox/streets-v11'));
 
   medicareLayer = L.mapbox.featureLayer().addTo(map);
   map.legendControl.addLegend(document.getElementById('legend').innerHTML);
@@ -344,15 +340,12 @@ function locationQuery(queryObj) {
       'properties': {}
     };
 
-    var ptBuffer = turf.buffer(dummyPt, 2, 'miles');
-    // Correcting for strange error in turf that returns FeatureCollection
-    var withinBoundary = ptBuffer.features[0];
+    var ptBuffer = turf.buffer(dummyPt, 2, {units: 'miles'});
   }
 
   queryArr = [];
   for (var i = 0; i < allProviders.length; ++i) {
-    //
-    if (turf.inside(allProviders[i], withinBoundary)) {
+    if (turf.inside(allProviders[i], ptBuffer)) {
       queryArr.push(allProviders[i]);
     }
   }
