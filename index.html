@@ -5,53 +5,67 @@ js_files:
   - /js/utils.js
   - /js/script.js
 ---
-<div class="container" id="main">
-  <div class="row map">
-    <div class="col-sm-4" id="bottom-div">
-      <img id="logo" class="img-responsive" src="img/logo.png">
-      <table class="search-container">
-        <tbody>
-          <tr>
-            <td>
-              <input class="typeahead form-control" id="addr-search" type="text" placeholder="Enter address, zip, or provider name">
-            </td>
-            <td>
-              <button id="search" class="searchAndClear"><i class="fa fa-search" aria-hidden="true"></i></button>
-            </td>
-            <td id="clearTD" class="hidden">
-              <button id="clearButton" class="searchAndClear"><i class="fa fa-times" aria-hidden="true"></i></button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p>Click on a pin to see details on each nursing home. Click on the home's name for more details.</p>
-      <p>This is a map of all the nursing homes in Chicagoland. The colors show <a href="https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py" target="_blank">Medicare</a>'s 1-5 star rating for each home. Red pins are the lowest and green pins are the highest.</p>
-      <p>Last Updated: <span id="lastUpdated"></span></p>
-      <div class="social-share">
-        <a class="facebook" href="http://www.facebook.com/share.php?u={{site.url}}" target="blank"><i class="fa fa-facebook"></i></a>
-        <a class="twitter" href="http://twitter.com/intent/tweet?status={{site.title}}+{{site.url}}" target="blank"><i class="fa fa-twitter"></i></a>
-      </div>
-    </div>
-    <div class="col-sm-8 map">
-      <div id='legend' style='display:none;'>
-        <strong>Nursing Homes by Overall Score</strong>
-        <nav class='legend clearfix'>
-          <span class="rating-1"></span>
-          <span class="rating-2"></span>
-          <span class="rating-3"></span>
-          <span class="rating-4"></span>
-          <span class="rating-5"></span>
-          <label>1</label>
-          <label>2</label>
-          <label>3</label>
-          <label>4</label>
-          <label>5</label>
-          <small>Source: <a href="https://data.medicare.gov/" target="_blank">Medicare Open Data</a></small>
-        </nav>
-      </div>
-      <div id="map">
-        <div id="loading_screen"><span>Loading map and nursing homes...</span></div>
-      </div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <h1>Chicago Nursing Home Search Has Retired</h1>
+      <p>This website is no longer actively maintained. We're leaving it online so you can see how it worked, but we recommend you use Medicare's search instead.</p>
+      <p>This site was originally developed to be a tool to find the best nursing home you can afford, but once we saw the map we knew there was something bigger going on. Why are there so many nursing homes in our area with the worst possible rating? Is that normal?</p>
+      <p>Illinois ranks near the bottom nationally for nursing home quality, according to <a href="http://nursinghomereportcards.com" target="_blank">Families for Better Care</a>. There are <a href="http://nursinghomereportcards.com/state/il/" target="_blank">several reasons</a>:
+        <ul>
+          <li>Too many Illinois nursing homes are cited by inspectors for severe deficiencies.</li>
+          <li>Too many Illinois nursing homes cut costs by understaffing.</li>
+          <li>Too many Illinois nursing homes use unnecessary medications to keep their residents docile.</li>
+        </ul>
+      </p>
+      <p>This <a href="http://www.chicagotribune.com/chi-nursing-home-safety-gallery-storygallery.html" target="_blank">Chicago Tribune nursing home series</a> by <a href="https://twitter.com/poolcar4" target="_blank">David Jackson</a> and <a href="https://twitter.com/garyjmarx" target="_blank">Gary Marx</a> is a great place to learn more about the recent history of nursing home issues in Illinois.</p>
+      <p>A <a href="http://ilga.gov/legislation/96/SB/09600SB0326enr.htm" target="_blank">2010 Long-Term Care Reform Bill</a> improved the situation; however, other concerns with Illinois nursing homes include:
+        <ul>
+          <li>Housing people of all ages with mental illness in the same homes with seniors</li>
+          <li>Nursing homes sending residents for unnecessary procedures to defraud Medicare or Medicaid</li>
+          <li>Nursing homes that provide few activities for residents</li>
+          <li>Outbreaks of diseases like Legionnaires'</li>
+        </ul>
+      </p>
+      <h3>Where do you get your data?</h3>
+      <p>We're showing you the <a href="https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py" target="_blank">Medicare Ratings</a> for these places. This <a href="https://data.medicare.gov" target="_blank">Medicare Data</a> has received some <a href="http://www.gao.gov/products/GAO-16-33" target="_blank">deserved criticism</a>, but it's getting better.
+        Here's a description of the <a href="https://www.cms.gov/medicare/provider-enrollment-and-certification/certificationandcomplianc/fsqrs.html" target="_blank">five-star quality ratings from Medicare</a>.
+      </p>
+      <h3>How can we improve nursing homes and get rid of the bad ones?</h3>
+      <p>
+        <ul>
+          <li>Regulations, inspections and <a href="https://www.propublica.org/article/two-deaths-different-penalties-disparities-in-nursing-homes-oversight" target="_blank">fines</a></li>
+          <li><a href="http://www.illinoiscares.org/family-councils" target="_blank">Family Councils</a></li>
+          <li><a href="http://sharenetworkchicago.org/" target="_blank">Outreach and Education</a></li>
+          <li><a href="http://illinoispioneercoalition.org/" target="_blank">Advocate for Person-Centered Care</a></li>
+      </ul>
+      </p>
+      <h3>Want to know more?</h3>
+      <p>We're not experts. We just did a lot of reading, talked to some people and then made a website. Here are some groups who are working on this problem.
+        <ul>
+          <li><a href="http://www.illinoiscares.org/" target="_blank">Illinois Citizens for Better Care</a> gave us the data on psych meds. Their website is a great resource for both families chosing homes and advocates.</li>
+          <li><a href="http://sharenetworkchicago.org/" target="_blank">The SHARE Network</a> is older adults, caregivers, providers, and aging specialists working together to improve health on Chicago’s South Side.</li>
+          <li><a href="http://illinoispioneercoalition.org/" target="_blank">Illinois Pioneer Coalition</a> has a lot of resources for families who need to find a nursing home. They also advocate for quality of life improvements.</li>
+          <li><a href="http://caregiveraction.org/" target="_blank">Caregiver Action Network</a></li>
+          <li><a href="https://www.propublica.org/series/nursing-homes" target="_blank">ProPublica Nursing Home Reports</a> is a great resource for national news on nursing homes.</li>
+          <li><a href="http://www.hmprg.org/Programs/Center+for+Long+Term+Care+Reform" target="_blank">Center for Long-Term Care Reform</a></li>
+          <li><a href="http://familiesforbettercare.com/" target="_blank">Families for Better Care</a></li>
+          <li><a href="http://medicine.uchicago.edu/geri/about.html" target="_blank">University of Chicago Geriatrics and Palliative Medicine</a></li>
+          <li><a href="https://www.illinois.gov/AGING/" target="_blank">Illinois Department on Aging</a></li>
+          <li><a href="http://www.dph.illinois.gov/topics-services/health-care-regulation/nursing-homes" target="_blank">Illinois Department of Public Health</a></li>
+          <li><a href="https://www.illinois.gov/aging/ProtectionAdvocacy/LTCOmbudsman/Pages/default.aspx" target="_blank">The Long-Term Care Ombudsman Program</a> is a resident-directed advocacy program which protects and improves the quality of life for residents in a variety of long-term care settings. Ombudsmen work to resolve problems of individual residents and to bring about changes at the local, state and national levels to improve care.</li>
+        </ul>
+      </p>
+      <h3>Who made this site?</h3>
+      <p>This project began with an August 2014 story in the New York Times by Katie Thomas called <a href="http://www.nytimes.com/2014/08/25/business/medicare-star-ratings-allow-nursing-homes-to-game-the-system.html?_r=0" target="_blank">"Medicare Star Ratings Allow Nursing Homes to Game the System."</a> The story got quite a bit of attention, including in Chicago's civic tech community.
+      </p>
+      <p>
+        At <a href="http://www.chihacknight.org" target="_blank">Chi Hack Night</a> a group formed to build an app to do something about it.
+        All the code is <a href="https://github.com/open-retirement/open-retirement.github.com" target="_blank">open source on GitHub</a>, and contributions are welcome!
+        <br><br>
+        <iframe src="https://ghbtns.com/github-btn.html?user=open-retirement&repo=open-retirement.github.com&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
+      </p>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/dAS4vBhTO6o" frameborder="0" allowfullscreen></iframe>
     </div>
   </div>
 </div>
