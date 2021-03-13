@@ -1,58 +1,8 @@
 ---
 layout: default
 permalink: /about
-js_files:
-  - /build/bower.min.js
-  - /js/utils.js
-  - /js/script.js
+
 ---
-<div class="container" id="main">
-  <div class="row map">
-    <div class="col-sm-4" id="bottom-div">
-      <img id="logo" class="img-responsive" src="img/logo.png">
-      <table class="search-container">
-        <tbody>
-          <tr>
-            <td>
-              <input class="typeahead form-control" id="addr-search" type="text" placeholder="Enter address, zip, or provider name">
-            </td>
-            <td>
-              <button id="search" class="searchAndClear"><i class="fa fa-search" aria-hidden="true"></i></button>
-            </td>
-            <td id="clearTD" class="hidden">
-              <button id="clearButton" class="searchAndClear"><i class="fa fa-times" aria-hidden="true"></i></button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p>Click on a pin to see details on each nursing home. Click on the home's name for more details.</p>
-      <p>This is a map of all the nursing homes in Chicagoland. The colors show <a href="https://data.medicare.gov/Nursing-Home-Compare/Provider-Info/4pq5-n9py" target="_blank">Medicare</a>'s 1-5 star rating for each home. Red pins are the lowest and green pins are the highest.</p>
-      <p>Last Updated: <span id="lastUpdated"></span></p>
-      <div class="social-share">
-        <a class="facebook" href="http://www.facebook.com/share.php?u={{site.url}}" target="blank"><i class="fa fa-facebook"></i></a>
-        <a class="twitter" href="http://twitter.com/intent/tweet?status={{site.title}}+{{site.url}}" target="blank"><i class="fa fa-twitter"></i></a>
-      </div>
-    </div>
-    <div class="col-sm-8 map">
-      <div id='legend' style='display:none;'>
-        <strong>Nursing Homes by Overall Score</strong>
-        <nav class='legend clearfix'>
-          <span class="rating-1"></span>
-          <span class="rating-2"></span>
-          <span class="rating-3"></span>
-          <span class="rating-4"></span>
-          <span class="rating-5"></span>
-          <label>1</label>
-          <label>2</label>
-          <label>3</label>
-          <label>4</label>
-          <label>5</label>
-          <small>Source: <a href="https://data.medicare.gov/" target="_blank">Medicare Open Data</a></small>
-        </nav>
-      </div>
-      <div id="map">
-        <div id="loading_screen"><span>Loading map and nursing homes...</span></div>
-      </div>
-    </div>
-  </div>
+<div>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/dAS4vBhTO6o" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
